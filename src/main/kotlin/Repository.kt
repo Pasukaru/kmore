@@ -15,8 +15,16 @@ class Repository {
     }
 
     private suspend inline fun <T> dbIO(crossinline block: suspend () -> T): Deferred<T> = coroutineScope {
+        // Ensure DB IO is offloaded into the IO Connection pool
+        // Unfortunately, we still need to synchronize because of JDBC
+        val tx = coroutineContext[TransactionContext] ?: throw IllegalStateException("No active database session")
         async(coroutineContext + IOScheduler) {
-            block()
+            tx.semaphore.acquire()
+            try {
+                block()
+            } finally {
+                tx.semaphore.release()
+            }
         }
     }
 }

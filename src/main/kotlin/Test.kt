@@ -1,19 +1,7 @@
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import java.sql.Connection
 import java.time.Instant
-import kotlin.coroutines.AbstractCoroutineContextElement
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.coroutineContext
-
-data class TransactionContext(
-    val connection: Connection
-) : AbstractCoroutineContextElement(TransactionContext) {
-    companion object Key : CoroutineContext.Key<TransactionContext> {
-        suspend fun getCurrentConnection(): Connection? = coroutineContext[TransactionContext]?.connection
-    }
-}
 
 fun log(msg: Any?) {
     println("${Instant.now()} - ${Thread.currentThread().name}: $msg")
@@ -37,19 +25,32 @@ suspend fun main() = coroutineScope {
         log("After new tx")
         repository.findById().await()
     }.join()
-    transaction {
-        log("==== NESTED TRANSACTIONS WITH ROLLBACK\n\n")
 
-        log("Before new tx")
-        repository.findById().await()
+    try {
+        transaction {
+            log("==== NESTED TRANSACTIONS WITH ROLLBACK\n\n")
 
-        val result = transaction {
-            log("Within new tx")
+            log("Before new tx")
             repository.findById().await()
-        }.await()
-        log("INNER TX RESULT: $result")
 
-        throw RuntimeException("DERP")
+            val result = transaction {
+                log("Within new tx")
+                repository.findById().await()
+            }.await()
+            log("INNER TX RESULT: $result")
+
+            throw RuntimeException("DERP")
+        }.join()
+    } catch (e: Throwable){
+        log("CAUGHT ERROR")
+        e.printStackTrace()
+    }
+
+    transaction {
+        log("==== A LOT OF CONCURRENT QUERIES\n\n")
+        (0..100_000)
+            .map { repository.findById() }
+            .forEach { it.await() }
     }.join()
 }
 
