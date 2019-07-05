@@ -7,7 +7,6 @@ class FakeConnection(val id: Int) : Connection {
     companion object{
         private var conCount = 1
         fun createConnection(): FakeConnection {
-            Thread.sleep(1000)
             return FakeConnection(conCount++)
         }
     }

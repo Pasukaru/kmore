@@ -6,14 +6,27 @@ group 'coroutines-custom-state'
 version '1.0-SNAPSHOT'
 
 repositories {
+    mavenLocal()
     mavenCentral()
+    jcenter()
+    maven { url "https://dl.bintray.com/kotlin/ktor" }
 }
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-core', version: '1.3.0-M2'
     compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-core-common', version: '1.3.0-M2'
+    compile group: 'io.ktor', name: 'ktor-server-core', version: '1.2.2'
+    compile "io.ktor:ktor-server-netty:1.2.2"
+    compile "io.ktor:ktor-websockets:1.2.2"
+    implementation "io.ktor:ktor-jackson:1.2.2"
+    implementation "io.ktor:ktor-locations:1.2.2"
+    compile("ch.qos.logback:logback-classic:1.2.3")
 
+    compile group: 'org.kodein.di', name: 'kodein-di-generic-jvm', version: '6.3.1'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.26'
+    compile group: 'org.jooq', name: 'jooq', version: '3.11.11'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.9'
 }
 
 compileKotlin {

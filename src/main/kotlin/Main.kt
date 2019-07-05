@@ -1,8 +1,16 @@
-import kotlinx.coroutines.*
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.joinAll
+import server.user.UserRepository
+import tx.DbScheduler
+import tx.transaction2Async
+import tx.transactionAsync
 import java.time.Instant
+import java.util.*
 
 suspend fun main() = coroutineScope {
-    val repository = Repository()
+    val repository = UserRepository()
+    val userId = UUID.randomUUID()
 
     transactionAsync {
 
@@ -50,16 +58,16 @@ suspend fun main() = coroutineScope {
         log("==== NESTED TRANSACTIONS")
 
         log("Before new tx")
-        repository.findById().await()
+        repository.findById(userId).await()
 
         val result = transactionAsync {
             log("Within new tx")
-            repository.findById().await()
+            repository.findById(userId).await()
         }.await()
         log("INNER TX RESULT: $result")
 
         log("After new tx")
-        repository.findById().await()
+        repository.findById(userId).await()
     }.await()
 
     try {
@@ -69,11 +77,11 @@ suspend fun main() = coroutineScope {
             log("==== NESTED TRANSACTIONS WITH ROLLBACK")
 
             log("Before new tx")
-            repository.findById().await()
+            repository.findById(userId).await()
 
             val result = transactionAsync {
                 log("Within new tx")
-                repository.findById().await()
+                repository.findById(userId).await()
             }.await()
             log("INNER TX RESULT: $result")
 
@@ -87,35 +95,10 @@ suspend fun main() = coroutineScope {
     println()
     log("==== WITHOUT TRANSACTION")
     try {
-        repository.findById().await()
+        repository.findById(userId).await()
     } catch (e: Throwable) {
         log("CAUGHT EXPECTED ERROR: ${e::class.java.simpleName} ${e.message}")
     }
 
     joinAll()
-}
-
-
-private suspend inline fun <T> transactionAsync(crossinline block: suspend () -> T): Deferred<T> = coroutineScope {
-    val tx = TransactionContext(FakeConnection.createConnection())
-    async(coroutineContext + tx) {
-        try {
-            val result = block()
-            log("<TX_COMMIT> $tx")
-            return@async result
-        } catch (e: Throwable) {
-            log("<TX_ROLLBACK> $tx")
-            e.printStackTrace()
-            throw e
-        }
-    }
-}
-
-private fun <T> CoroutineScope.transaction2Async(block: suspend CoroutineScope.() -> T): Deferred<T> {
-    // Use DB IO thread to await connection
-    return async(DbScheduler) {
-        val tx = TransactionContext(FakeConnection.createConnection())
-        // Switch back to main threads for the transaction
-        async(Dispatchers.Default + tx, CoroutineStart.DEFAULT, block).await()
-    }
 }
