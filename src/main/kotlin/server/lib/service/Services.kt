@@ -2,12 +2,13 @@
 
 package server.lib.service
 
-import org.kodein.di.KodeinAware
-import org.kodein.di.generic.instance
-import server.KtorMain
+import server.containerModule
 import server.user.UserService
 
-class Services : KodeinAware {
-    override val kodein by lazy { KtorMain.kodein }
-    val user: UserService by instance()
+class Services(
+    val user: UserService
+) {
+    companion object {
+        val MODULE = Services::class.containerModule()
+    }
 }

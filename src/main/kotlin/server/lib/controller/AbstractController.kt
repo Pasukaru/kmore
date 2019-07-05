@@ -9,17 +9,14 @@ import io.ktor.locations.put
 import io.ktor.response.respond
 import io.ktor.routing.Routing
 import io.ktor.util.pipeline.PipelineContext
-import org.kodein.di.generic.instance
-import server.KtorMain
+import server.inject
 import server.lib.service.Services
 import tx.transaction2Async
 
 @KtorExperimentalLocationsAPI
 abstract class AbstractController : Controller {
 
-    override val kodein by lazy { KtorMain.kodein }
-
-    val services: Services by instance()
+    val services: Services by inject()
 
     abstract val routing: Routing.() -> Unit
 

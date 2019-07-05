@@ -1,8 +1,12 @@
 package server.lib.repository
 
-import org.kodein.di.generic.instance
+import server.containerModule
 import server.user.UserRepository
 
-class Repositories : AbstractRepository() {
-    val user: UserRepository by instance()
+class Repositories(
+    val user: UserRepository
+) : AbstractRepository() {
+    companion object {
+        val MODULE = Repositories::class.containerModule()
+    }
 }
