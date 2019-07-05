@@ -6,7 +6,10 @@ class FakeConnection(val id: Int) : Connection {
 
     companion object{
         private var conCount = 1
-        fun createConnection() = FakeConnection(conCount++)
+        fun createConnection(): FakeConnection {
+            Thread.sleep(1000)
+            return FakeConnection(conCount++)
+        }
     }
 
     override fun toString(): String = "FakeConnection(id=$id)"
