@@ -1,22 +1,29 @@
 package my.company.app.db.user
 
-import kotlinx.coroutines.Deferred
 import my.company.app.lib.repository.AbstractRepository
-import my.company.app.lib.tx.TransactionContext
-import my.company.app.log
+import my.company.jooq.Tables.USER
+import my.company.jooq.tables.User
+import my.company.jooq.tables.records.UserRecord
+import java.time.Instant
 import java.util.*
-import kotlin.coroutines.coroutineContext
 
-open class UserRepository : AbstractRepository() {
-    private var count = 1
+open class UserRepository : AbstractRepository<UUID, User, UserRecord>(USER) {
+    suspend fun findByEmailIgnoringCase(email: String): UserRecord? =
+        fetchOne { dsl.select().from(table).where(table.EMAIL.equalIgnoreCase(email.trim())) }
+}
 
-    suspend fun findById(id: UUID): Deferred<DbUser> = dbAsync {
-        log("FIND BY ID: " + coroutineContext[TransactionContext])
-        return@dbAsync DbUser(id = id, name = "$count")
-    }
-
-    suspend fun noOp(delayInMs: Long = 0): Deferred<Unit> = dbAsync {
-        @Suppress("BlockingMethodInNonBlockingContext")
-        if (delayInMs > 0) Thread.sleep(delayInMs) // JDBC would block the whole thread
+fun newUser(
+    email: String,
+    firstName: String,
+    lastName: String,
+    password: String
+): UserRecord {
+    return UserRecord().also {
+        it.id = UUID.randomUUID()
+        it.email = email
+        it.firstName = firstName
+        it.lastName = lastName
+        it.password = password
+        it.createdAt = Instant.now()
     }
 }

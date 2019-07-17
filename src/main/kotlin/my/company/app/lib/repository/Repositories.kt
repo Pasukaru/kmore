@@ -5,7 +5,7 @@ import my.company.app.db.user.UserRepository
 
 class Repositories(
     val user: UserRepository
-) : AbstractRepository() {
+) {
     companion object {
         val MODULE = Repositories::class.containerModule()
     }

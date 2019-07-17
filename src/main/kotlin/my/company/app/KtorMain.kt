@@ -16,11 +16,13 @@ import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.util.AttributeKey
+import my.company.app.db.jooq.HikariCPFeature
 import my.company.app.lib.controller.Controller
 import my.company.app.lib.ktor.uuidConverter
 import my.company.app.lib.repository.Repositories
-import my.company.app.lib.service.Services
 import org.koin.core.KoinApplication
+import org.koin.core.context.GlobalContext
+import org.koin.dsl.module
 import org.koin.ktor.ext.Koin
 import org.koin.ktor.ext.getKoin
 import org.reflections.Reflections
@@ -29,6 +31,7 @@ import java.lang.management.ManagementFactory
 import java.lang.reflect.Modifier
 import java.time.Duration
 import java.time.Instant
+import java.time.ZoneOffset
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -76,26 +79,31 @@ private object StartupLog : ApplicationFeature<Application, KoinApplication, Koi
 }
 
 private fun Application.mainModule() {
+    TimeZone.setDefault(TimeZone.getTimeZone(ZoneOffset.UTC))
     install(CallLogging)
     install(Locations)
     install(DataConversion) {
         uuidConverter()
     }
 
-    install(ContentNegotiation) {
-        jackson {}
-    }
-
     install(Koin) {
         modules(
             listOf(
-                Repositories.MODULE,
-                Services.MODULE
+                Repositories.MODULE
             )
         )
     }
 
+    install(ContentNegotiation) {
+        jackson {
+            GlobalContext.get().modules(module { single { this@jackson } })
+
+        }
+    }
+
     install(Routing).initControllers()
+
+    install(HikariCPFeature)
 
     install(StartupLog)
 }

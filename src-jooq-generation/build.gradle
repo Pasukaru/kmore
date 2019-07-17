@@ -1,0 +1,44 @@
+apply plugin: 'kotlin'
+apply plugin: 'maven'
+apply plugin: 'idea'
+apply plugin: 'org.owasp.dependencycheck'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url 'https://plugins.gradle.org/m2/' }
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    compile group: 'org.jooq', name: 'jooq-codegen', version: jooqVersion
+    compile group: 'org.jooq', name: 'jooq-meta', version: jooqVersion
+    compile group: 'org.jooq', name: 'jooq-meta-extensions', version: jooqVersion
+    compile group: 'org.postgresql', name: 'postgresql', version: postgresDriverVersion
+    compile group: 'org.flywaydb', name: 'flyway-core', version: flywayVersion
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+
+    // JOOQ depends on these
+    compile('javax.xml.bind:jaxb-api:2.3.0')
+    compile('javax.activation:activation:1.1')
+    compile('org.glassfish.jaxb:jaxb-runtime:2.3.0')
+}
+
+def disabledTasks = ['test']
+
+gradle.taskGraph.whenReady {
+    gradle.taskGraph.allTasks.each {
+        if (it.project == project) {
+            if (disabledTasks.contains(it.name)) {
+                it.onlyIf { false }
+            }
+        }
+    }
+}
+
+task generateJooqClasses(type: JavaExec) {
+    classpath sourceSets.main.runtimeClasspath
+    workingDir = project.projectDir
+    main = "my.company.JooqCodeGeneratorKt"
+}

@@ -1,0 +1,22 @@
+version: '3.2'
+volumes:
+  data:
+services:
+  postgres:
+    image: postgres:9.6.14-alpine
+    container_name: my_project_postgres_unsafe
+    command: postgres -p 10001 -c config_file=/postgresql-custom.conf
+    volumes:
+      - ./postgres-unsafe/postgresql-custom.conf:/postgresql-custom.conf
+    environment:
+      - POSTGRES_USER=my_project
+      - POSTGRES_PASSWORD=my_project
+      - POSTGRES_DB=my_project
+    ports:
+      - "10001:10001"
+    healthcheck:
+      test: echo "SELECT 1" | psql -q -p 9005 -U my_project > /dev/null
+      interval: 10s
+      timeout: 1s
+      retries: 3
+    restart: always

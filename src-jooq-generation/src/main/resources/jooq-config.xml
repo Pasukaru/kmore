@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.11.0.xsd">
+    <jdbc>
+        <url>jdbc:postgresql://localhost:10001/{DATABASE}</url>
+        <user>my_project</user>
+        <password>my_project</password>
+    </jdbc>
+    <generator>
+        <database>
+            <name>org.jooq.meta.postgres.PostgresDatabase</name>
+            <inputSchema>public</inputSchema>
+            <includes>.*</includes>
+            <excludes>FLYWAY_SCHEMA_HISTORY</excludes>
+
+            <properties>
+                <property>
+                    <key>codegen-db</key>
+                    <value>my_project</value>
+                </property>
+                <property>
+                    <key>maintenance-db</key>
+                    <value>postgres</value>
+                </property>
+            </properties>
+
+            <forcedTypes>
+                <forcedType>
+                    <userType>java.time.Instant</userType>
+                    <binding>my.company.app.db.jooq.binding.TimestampInstantBinding</binding>
+                    <types>timestamp\Wwithout\Wtime\Wzone</types>
+                </forcedType>
+            </forcedTypes>
+        </database>
+
+        <generate>
+            <validationAnnotations>true</validationAnnotations>
+            <!-- Generation flags: See advanced configuration properties -->
+        </generate>
+
+        <target>
+            <packageName>my.company.jooq</packageName>
+            <directory>../src/generated</directory>
+        </target>
+    </generator>
+</configuration>

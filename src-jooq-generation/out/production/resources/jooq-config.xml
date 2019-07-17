@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.11.0.xsd">
+    <jdbc>
+        <url>jdbc:postgresql://localhost:9005/{DATABASE}</url>
+        <user>ecomplete</user>
+        <password>ecomplete</password>
+    </jdbc>
+    <generator>
+        <database>
+            <name>org.jooq.meta.postgres.PostgresDatabase</name>
+            <inputSchema>public</inputSchema>
+            <includes>.*</includes>
+
+            <forcedTypes>
+                <forcedType>
+                    <userType>my.company.db.hibernate.TimestampRange</userType>
+                    <binding>my.company.db.jooq.binding.TimestampRangeBinding</binding>
+                    <expression>VALIDITY</expression>
+                    <types>.*</types>
+                </forcedType>
+                <forcedType>
+                    <userType>com.fasterxml.jackson.databind.JsonNode</userType>
+                    <binding>my.company.db.jooq.binding.JsonNodeBinding</binding>
+                    <expression>.*JSON.*</expression>
+                    <types>.*</types>
+                </forcedType>
+                <forcedType>
+                    <userType>my.company.consumer.shared.enums.UseCase</userType>
+                    <enumConverter>true</enumConverter>
+                    <expression>USE_CASE</expression>
+                    <types>.*</types>
+                </forcedType>
+                <forcedType>
+                    <userType>my.company.db.types.UserFlag[]</userType>
+                    <binding>my.company.db.jooq.UserFlagsConverter</binding>
+                    <expression>.*CUSTOMER_USER\.FLAGS</expression>
+                    <types>.*</types>
+                </forcedType>
+            </forcedTypes>
+
+            <properties>
+                <property>
+                    <key>codegen-db</key>
+                    <value>ecomplete</value>
+                </property>
+                <property>
+                    <key>maintenance-db</key>
+                    <value>postgres</value>
+                </property>
+            </properties>
+        </database>
+
+        <generate>
+            <!-- Generation flags: See advanced configuration properties -->
+        </generate>
+
+        <target>
+            <packageName>my.company.jooq</packageName>
+            <directory>../src/generated</directory>
+        </target>
+    </generator>
+</configuration>
