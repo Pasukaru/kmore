@@ -1,32 +1,83 @@
-plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.3.31'
+import java.nio.file.Files
+
+buildscript {
+    ext {
+        IS_CI = System.getenv("CI") != null && !System.getenv("CI").isEmpty()
+        detektFiles = project.hasProperty("detektFiles") ? project.getProperty("detektFiles") : ""
+        kotlinVersion = '1.3.31'
+        kotlinCoroutinesVersion = '1.3.0-M2'
+        detektVersion = '1.0.0-RC14'
+        ktorVersion = '1.2.2'
+        koinVersion = '2.0.1'
+        jooqVersion = '3.11.11'
+    }
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+        maven { url "https://dl.bintray.com/kotlin/ktor" }
+        maven { url 'https://plugins.gradle.org/m2/' }
+    }
+
+    dependencies {
+        classpath group: "org.jetbrains.kotlin", name: "kotlin-compiler-embeddable", version: kotlinVersion
+        classpath group: "org.jetbrains.kotlin", name: 'kotlin-allopen', version: kotlinVersion
+        classpath group: "org.jetbrains.kotlin", name: "kotlin-gradle-plugin", version: kotlinVersion
+        classpath group: "org.owasp", name: "dependency-check-gradle", version: "3.3.0"
+        classpath group: "com.github.ben-manes", name: "gradle-versions-plugin", version: "0.20.0"
+        classpath group: "io.gitlab.arturbosch.detekt", name: "detekt-gradle-plugin", version: detektVersion
+        classpath group: "io.gitlab.arturbosch.detekt", name: "detekt-formatting", version: detektVersion
+    }
 }
 
 group 'coroutines-custom-state'
 version '1.0-SNAPSHOT'
 
+apply plugin: 'kotlin'
+apply plugin: 'maven'
+apply plugin: 'idea'
+apply plugin: 'org.owasp.dependencycheck'
+apply plugin: 'com.github.ben-manes.versions'
+apply plugin: 'io.gitlab.arturbosch.detekt'
+
 repositories {
     mavenLocal()
     mavenCentral()
-    jcenter()
-    maven { url "https://dl.bintray.com/kotlin/ktor" }
+    maven { url 'https://plugins.gradle.org/m2/' }
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.31"
-    compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-core', version: '1.3.0-M2'
-    compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-core-common', version: '1.3.0-M2'
-    compile group: 'io.ktor', name: 'ktor-server-core', version: '1.2.2'
-    compile "io.ktor:ktor-server-netty:1.2.2"
-    compile "io.ktor:ktor-websockets:1.2.2"
-    implementation "io.ktor:ktor-jackson:1.2.2"
-    implementation "io.ktor:ktor-locations:1.2.2"
+    implementation group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: kotlinVersion
+    compile group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: kotlinVersion
+    compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-core', version: kotlinCoroutinesVersion
+    compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-core-common', version: kotlinCoroutinesVersion
+    compile group: 'io.ktor', name: 'ktor-server-core', version: ktorVersion
+    compile group: 'io.ktor', name: 'ktor-server-netty', version: ktorVersion
+    compile group: 'io.ktor', name: 'ktor-websockets', version: ktorVersion
+    implementation group: 'io.ktor', name: 'ktor-jackson', version: ktorVersion
+    implementation group: 'io.ktor', name: 'ktor-locations', version: ktorVersion
+    compile group: 'org.koin', name: 'koin-ktor', version: koinVersion
+
     compile("ch.qos.logback:logback-classic:1.2.3")
     compile group: 'org.reflections', name: 'reflections', version: '0.9.11'
-    compile group: 'org.koin', name: 'koin-ktor', version: '2.0.1'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.26'
-    compile group: 'org.jooq', name: 'jooq', version: '3.11.11'
+    compile group: 'org.jooq', name: 'jooq', version: jooqVersion
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.9'
+}
+
+
+detekt {
+    parallel = true
+    filters = ".*/resources/.*,.*/build/.*"
+    config = files("./detekt.yml")
+    if (detektFiles != "") {
+        def changedFiles = detektFiles.readLines().stream().toArray { size -> new String[size] }
+        input = files(changedFiles)
+    } else {
+        input = files("src/main/kotlin", "src/test/kotlin")
+    }
 }
 
 compileKotlin {
@@ -41,4 +92,23 @@ task run(type: JavaExec) {
     dependsOn(build)
     classpath sourceSets.main.runtimeClasspath
     main = "MainKt"
+}
+
+println("Checking for pre-commit installation")
+def gitHooksDir = project.file('.git/hooks')
+if (gitHooksDir.isDirectory()) {
+    if (IS_CI) {
+        println("Skipping pre-commit hook installation for CI environments")
+    } else {
+        def srcHook = project.file('scripts/pre-commit')
+        def tgtHook = new File(gitHooksDir, srcHook.name)
+        if (!tgtHook.exists() || Files.size(srcHook.toPath()) != Files.size(tgtHook.toPath())) {
+            print('Installing git pre-commit hook... ')
+            tgtHook.withOutputStream { Files.copy(srcHook.toPath(), it) }
+            tgtHook.setExecutable(true)
+            println(' Done.')
+        } else {
+            print('Pre-commit hook is already installed')
+        }
+    }
 }

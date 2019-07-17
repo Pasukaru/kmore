@@ -4,6 +4,7 @@ import java.sql.*
 import java.util.*
 import java.util.concurrent.Executor
 
+@Suppress("TooManyFunctions", "StringLiteralDuplication")
 class FakeConnection(val id: Int) : Connection {
 
     companion object{

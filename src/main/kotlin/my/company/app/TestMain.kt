@@ -1,3 +1,5 @@
+@file:Suppress("MagicNumber")
+
 package my.company.app
 
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -88,7 +90,7 @@ suspend fun main() = coroutineScope {
             }.await()
             log("INNER TX RESULT: $result")
 
-            throw RuntimeException("TRANSACTION KILLER")
+            throw IllegalStateException("TRANSACTION KILLER")
         }.await()
     } catch (e: Throwable) {
         log("CAUGHT EXPECTED ERROR: ${e::class.java.simpleName} ${e.message}")

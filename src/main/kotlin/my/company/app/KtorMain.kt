@@ -32,8 +32,13 @@ import java.time.Instant
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-
 private class KtorMain {
+
+    companion object {
+        const val GRADE_PERIOD_IN_SECONDS = 1L
+        const val SHUTDOWM_TIMEOUT_IN_SECONDS = 5L
+    }
+
     fun main() {
         embeddedServer(
             Netty,
@@ -45,7 +50,7 @@ private class KtorMain {
     private fun <T : ApplicationEngine> T.gracefulStart(): T {
         this.start(wait = false)
         Runtime.getRuntime().addShutdownHook(Thread({
-            this.stop(1, 5, TimeUnit.SECONDS)
+            this.stop(GRADE_PERIOD_IN_SECONDS, SHUTDOWM_TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
         }, "KtorMain"))
         Thread.currentThread().join()
         return this

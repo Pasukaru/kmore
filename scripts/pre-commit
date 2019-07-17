@@ -1,0 +1,15 @@
+#!/bin/sh
+# Automatically loaded into the git hooks folder by our build.gradle
+
+# cd to project root
+cd "$(dirname "$0")/../.."
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
+
+kotlinChanges=$(git diff --cached --name-only | grep '\.kts\?$')
+if [ -n "$kotlinChanges" ]; then
+    echo ${NC}Kotlin changes detected. Executing Detekt...
+    ./scripts/detekt.sh || exit 1
+fi
