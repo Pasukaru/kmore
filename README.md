@@ -1,5 +1,6 @@
-TODO: Find out how to assign a dedicated thread to each db connection and use a CoroutineDispatcher to 
-propertly schedule coroutines from repositories in the right thread.
+How to run: Create a run configuration for `KtorMain`
 
+Swagger:
 
-How to run: `./gradlew run` (Or create a run configuration for `MainKt`)
+http://localhost:8080/apidocs/index.html?url=swagger.json
+∞

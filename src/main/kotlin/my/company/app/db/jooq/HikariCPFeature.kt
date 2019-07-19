@@ -6,13 +6,10 @@ import io.ktor.application.Application
 import io.ktor.application.ApplicationFeature
 import io.ktor.application.ApplicationStopping
 import io.ktor.util.AttributeKey
+import my.company.app.lib.logger
 import org.koin.core.KoinApplication
 import org.koin.core.context.GlobalContext
-import org.koin.core.definition.BeanDefinition
-import org.koin.core.definition.Kind
-import org.koin.core.definition.Options
 import org.koin.dsl.module
-import org.slf4j.LoggerFactory
 
 class HikariCPFeature {
 
@@ -21,7 +18,7 @@ class HikariCPFeature {
     companion object Feature : ApplicationFeature<Application, KoinApplication, HikariCPFeature> {
         private const val MIN_IDLE = 10
         private const val MAX_POOL_SIZE = 20
-        private val logger = LoggerFactory.getLogger(HikariCPFeature::class.java)
+        private val logger = logger<HikariCPFeature>()
 
         override val key: AttributeKey<HikariCPFeature> get() = AttributeKey("DSLContext")
 
@@ -31,9 +28,7 @@ class HikariCPFeature {
             val feature = HikariCPFeature()
 
             GlobalContext.get().modules(module {
-                val bean = BeanDefinition<Any>(null, null, HikariPool::class)
-
-                bean.definition = {
+                single {
                     logger.debug("Initializing Hikari config")
                     val config = HikariConfig()
                     config.username = "my_project"
@@ -54,9 +49,6 @@ class HikariCPFeature {
 
                     pool
                 }
-
-                bean.kind = Kind.Single
-                this.declareDefinition(bean, Options())
             })
 
             return feature

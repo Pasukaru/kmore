@@ -21,7 +21,7 @@ import java.time.Instant
 class TimestampInstantBinding : Binding<Timestamp, Instant> {
 
     companion object InstantConverter : Converter<Timestamp, Instant> {
-        private val bindingLogger = JooqLogger.getLogger(DefaultBinding::class.java)
+        private val bindingLogger = JooqLogger.getLogger(DefaultBinding::class.java)!!
         private val FROM_TYPE = Timestamp::class.java
         private val TO_TYPE = Instant::class.java
         override fun from(databaseObject: Timestamp?): Instant? = databaseObject?.toInstant()

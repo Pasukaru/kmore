@@ -64,6 +64,7 @@ dependencies {
     compile group: 'org.postgresql', name: 'postgresql', version: postgresDriverVersion
     compile group: 'org.flywaydb', name: 'flyway-core', version: flywayVersion
     compile group: 'com.zaxxer', name: 'HikariCP', version: '3.3.1'
+    compile group: 'de.nielsfalk.ktor', name: 'ktor-swagger', version: '0.5.0'
 
     compile("ch.qos.logback:logback-classic:1.2.3")
     compile group: 'org.reflections', name: 'reflections', version: '0.9.11'

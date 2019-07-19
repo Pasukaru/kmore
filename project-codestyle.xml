@@ -1,0 +1,86 @@
+<code_scheme name="Project" version="173">
+  <option name="RIGHT_MARGIN" value="300" />
+  <JavaCodeStyleSettings>
+    <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="999" />
+    <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="999" />
+  </JavaCodeStyleSettings>
+  <JetCodeStyleSettings>
+    <option name="PACKAGES_TO_USE_STAR_IMPORTS">
+      <value>
+        <package name="kotlinx.android.synthetic" withSubpackages="true" static="false" />
+      </value>
+    </option>
+    <option name="NAME_COUNT_TO_USE_STAR_IMPORT" value="2147483647" />
+    <option name="NAME_COUNT_TO_USE_STAR_IMPORT_FOR_MEMBERS" value="2147483647" />
+  </JetCodeStyleSettings>
+  <SqlCodeStyleSettings version="2">
+    <option name="KEYWORD_CASE" value="0" />
+    <option name="TYPE_CASE" value="0" />
+    <option name="QUERY_EL_LINE" value="0" />
+    <option name="QUERY_IN_ONE_STRING" value="1" />
+    <option name="QUERY_TRUE_INDENT" value="false" />
+    <option name="QUERY_ALIGN_ELEMENTS" value="false" />
+    <option name="SUBQUERY_OPENING" value="4" />
+    <option name="SUBQUERY_CONTENT" value="2" />
+    <option name="SUBQUERY_CLOSING" value="2" />
+    <option name="INSERT_INTO_NL" value="2" />
+    <option name="INSERT_CONTENT" value="2" />
+    <option name="INSERT_CLOSING" value="3" />
+    <option name="INSERT_TABLE_EL_LINE" value="1" />
+    <option name="INSERT_VALUES_EL_LINE" value="101" />
+    <option name="INSERT_EL_WRAP" value="1" />
+    <option name="SET_EL_LINE" value="101" />
+    <option name="SET_EL_COMMA" value="2" />
+    <option name="SET_ALIGN_EQUAL_SIGN" value="false" />
+    <option name="SELECT_EL_LINE" value="101" />
+    <option name="SELECT_EL_COMMA" value="2" />
+    <option name="SELECT_KEEP_N_ITEMS_IN_LINE" value="0" />
+    <option name="SELECT_USE_AS_WORD" value="1" />
+    <option name="FROM_EL_LINE" value="1" />
+    <option name="FROM_EL_WRAP" value="0" />
+    <option name="FROM_EL_COMMA" value="2" />
+    <option name="FROM_ONLY_JOIN_INDENT" value="2" />
+    <option name="FROM_PLACE_ON" value="10" />
+    <option name="ORDER_EL_LINE" value="101" />
+    <option name="TABLE_OPENING" value="1" />
+    <option name="TABLE_CONTENT" value="2" />
+    <option name="TABLE_CLOSING" value="3" />
+    <option name="TABLE_ALTER_INSTRUCTION_ALIGN" value="false" />
+    <option name="POST_OPT_WRAP_2" value="false" />
+    <option name="ROUTINE_ARG_CONTENT" value="2" />
+    <option name="ROUTINE_ARG_CLOSING" value="3" />
+    <option name="ROUTINE_ARG_WRAP" value="1" />
+    <option name="ROUTINE_ARG_ALIGN_TYPES" value="true" />
+    <option name="IMP_COMMON_WRAP_EVERY_STATEMENT" value="true" />
+    <option name="IMP_COMMON_KEEP_BLANK_LINES_IN_CODE" value="1" />
+    <option name="IMP_DECLARE_EL_WRAP" value="1" />
+    <option name="IMP_IF_THEN_WRAP_THEN" value="true" />
+    <option name="CORTEGE_COMMA_1ST" value="true" />
+    <option name="CORTEGE_CLOSING" value="1" />
+    <option name="EXPR_BINARY_OP_ALIGN" value="false" />
+    <option name="EXPR_CASE_WHEN_INDENT" value="false" />
+    <option name="EXPR_CASE_END" value="2" />
+    <option name="EXPR_CASE_COLLAPSE" value="false" />
+    <option name="NEW_LINE_BEFORE_OTHER_CLAUSES" value="false" />
+    <option name="WRAP_INSIDE_ARGUMENT_DEFINITION" value="0" />
+    <option name="WRAP_INSIDE_CALL_EXPRESSION" value="0" />
+    <option name="WRAP_PARENTHESIZED_EXPRESSION_INSIDE_VALUES" value="0" />
+  </SqlCodeStyleSettings>
+  <codeStyleSettings language="SQL">
+    <option name="KEEP_LINE_BREAKS" value="false" />
+    <indentOptions>
+      <option name="INDENT_SIZE" value="2" />
+      <option name="CONTINUATION_INDENT_SIZE" value="4" />
+      <option name="TAB_SIZE" value="2" />
+    </indentOptions>
+  </codeStyleSettings>
+  <codeStyleSettings language="kotlin">
+    <option name="KEEP_BLANK_LINES_IN_DECLARATIONS" value="1" />
+    <option name="KEEP_BLANK_LINES_IN_CODE" value="1" />
+    <option name="KEEP_BLANK_LINES_BEFORE_RBRACE" value="0" />
+    <option name="ALIGN_MULTILINE_PARAMETERS" value="false" />
+    <indentOptions>
+      <option name="CONTINUATION_INDENT_SIZE" value="4" />
+    </indentOptions>
+  </codeStyleSettings>
+</code_scheme>

@@ -7,12 +7,14 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.sync.Mutex
-import my.company.app.inject
+import kotlinx.coroutines.withContext
+import my.company.app.lib.eager
+import my.company.app.lib.inject
+import my.company.app.lib.logger
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
-import org.slf4j.LoggerFactory
 import java.sql.Connection
-import java.util.*
+import java.util.UUID
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.coroutineContext
@@ -23,17 +25,22 @@ class TransactionContext(
 ) : AbstractCoroutineContextElement(TransactionContext) {
 
     companion object Key : CoroutineContext.Key<TransactionContext> {
-        val logger = LoggerFactory.getLogger(TransactionContext::class.java)!!
+        val logger = logger<TransactionContext>()
     }
 
     val id = UUID.randomUUID()!!
 
-    val mutex: Mutex = Mutex()
+    private val mutex: Mutex = Mutex()
     var committed: Boolean = false
         private set
 
     var rolledBack: Boolean = false
         private set
+
+    private val beforeCommitHooks = mutableListOf<() -> Unit>()
+    private val afterCommitHooks = mutableListOf<() -> Unit>()
+    private val afterRollbackHooks = mutableListOf<() -> Unit>()
+    private val afterCompletionHooks = mutableListOf<() -> Unit>()
 
     suspend fun beginTransaction() {
         execute {
@@ -43,11 +50,14 @@ class TransactionContext(
     }
 
     suspend fun commit() {
+        beforeCommitHooks.forEach { it.invoke() }
         execute {
             logger.trace("$this: COMMIT")
             DSL.using(connection, dialect).execute("COMMIT")
             committed = true
         }
+        afterCommitHooks.forEach { it.invoke() }
+        afterCompletionHooks.forEach { it.invoke() }
     }
 
     suspend fun rollback() {
@@ -56,6 +66,8 @@ class TransactionContext(
             DSL.using(connection, dialect).execute("ROLLBACK")
             rolledBack = true
         }
+        afterRollbackHooks.forEach { it.invoke() }
+        afterCompletionHooks.forEach { it.invoke() }
     }
 
     fun expectActive() {
@@ -75,6 +87,11 @@ class TransactionContext(
             mutex.unlock()
         }
     }
+
+    fun beforeCommit(block: () -> Unit) = beforeCommitHooks.add(block)
+    fun afterCommit(block: () -> Unit) = afterCommitHooks.add(block)
+    fun afterRollback(block: () -> Unit) = afterRollbackHooks.add(block)
+    fun afterCompletion(block: () -> Unit) = afterCompletionHooks.add(block)
 
     override fun toString(): String = "TransactionContext[$id]"
 }
@@ -101,5 +118,37 @@ fun <T> CoroutineScope.transactionAsync(block: suspend CoroutineScope.() -> T): 
         } finally {
             pool.evictConnection(tx.connection)
         }
+    }
+}
+
+suspend fun <T> transaction(block: suspend CoroutineScope.() -> T): T {
+    val pool = eager<HikariPool>()
+    val tx = TransactionContext(pool.connection)
+
+    tx.beginTransaction()
+
+    try {
+        val result = withContext(tx, block)
+
+        tx.commit()
+
+        return result
+    } catch (e: Throwable) {
+        tx.rollback()
+        throw e
+    } finally {
+        pool.evictConnection(tx.connection)
+    }
+}
+
+suspend fun <T> withoutTransaction(block: suspend CoroutineScope.() -> T): T {
+    val pool = eager<HikariPool>()
+    val tx = TransactionContext(pool.connection)
+    try {
+        return withContext(tx, block)
+    } catch (e: Throwable) {
+        throw e
+    } finally {
+        pool.evictConnection(tx.connection)
     }
 }

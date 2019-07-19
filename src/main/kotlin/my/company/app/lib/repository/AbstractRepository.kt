@@ -1,9 +1,5 @@
 package my.company.app.lib.repository
 
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
-import my.company.app.lib.tx.DbScheduler
 import my.company.app.lib.tx.TransactionContext
 import org.jooq.DSLContext
 import org.jooq.Field
@@ -12,7 +8,9 @@ import org.jooq.Record
 import org.jooq.SQLDialect
 import org.jooq.Table
 import org.jooq.impl.DSL
+import java.sql.Connection
 import java.sql.SQLDataException
+import kotlin.coroutines.coroutineContext
 import kotlin.reflect.full.isSubclassOf
 
 abstract class AbstractRepository<ID, TABLE : Table<RECORD>, RECORD : Record>(
@@ -48,15 +46,10 @@ abstract class AbstractRepository<ID, TABLE : Table<RECORD>, RECORD : Record>(
         if (result != 1) throw SQLDataException("Failed to delete by id: $id")
     }
 
-    // I also tried to inline this one (and cross inline `block`) but it didn't noticeably affect performance.
-    protected suspend fun <T> dbAsync(block: suspend (TransactionContext) -> T): Deferred<T> = coroutineScope {
-        // Offload the blocking JDBC IO to the DB IO Connection pool, so that the other threads can continue working on other things
+    protected suspend fun <T> db(block: suspend Connection.() -> T): T {
         val tx = coroutineContext[TransactionContext] ?: throw IllegalStateException("No active database session")
-        async(DbScheduler) { tx.execute { block(tx) } }
+        return tx.execute(block)
     }
-
-    protected suspend inline fun <T> db(crossinline block: suspend TransactionContext.() -> T): T =
-        coroutineScope { dbAsync { tx -> block(tx) }.await() }
 
 
     protected suspend fun fetchOne(op: () -> Query): RECORD? = db {
@@ -88,6 +81,6 @@ abstract class AbstractRepository<ID, TABLE : Table<RECORD>, RECORD : Record>(
     }
 
     @Suppress("MemberVisibilityCanBePrivate")
-    protected open fun TransactionContext.connectionDsl(dialect: SQLDialect = this@AbstractRepository.dialect): DSLContext =
-        DSL.using(this.connection, dialect)
+    protected open fun Connection.connectionDsl(dialect: SQLDialect = this@AbstractRepository.dialect): DSLContext =
+        DSL.using(this, dialect)
 }

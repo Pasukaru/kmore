@@ -25,4 +25,4 @@ CREATE TABLE "session"
 
 ALTER TABLE "session"
   ADD CONSTRAINT "pk_session" PRIMARY KEY ("id"),
-  ADD CONSTRAINT "fk_session_user" FOREIGN KEY ("id") REFERENCES "user" ("id");
+  ADD CONSTRAINT "fk_session_user" FOREIGN KEY ("user_id") REFERENCES "user" ("id");

@@ -1,5 +1,6 @@
-package my.company.app
+package my.company.app.lib
 
+import my.company.app.PackageNoOp
 import org.koin.core.Koin
 import org.koin.core.context.GlobalContext
 import org.koin.core.definition.BeanDefinition
@@ -9,36 +10,50 @@ import org.koin.core.module.Module
 import org.koin.core.qualifier.Qualifier
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
-import org.slf4j.LoggerFactory
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.primaryConstructor
 
+private val KoinLogger = logger(PackageNoOp::class.java.packageName + ".Koin")
+
+fun Koin.resolveParameters(fn: KFunction<*>): Map<KParameter, Any> {
+    return fn.parameters.associateWith { parameter ->
+        KoinLogger.trace("Resolving parameter: $parameter")
+        val type = parameter.type.classifier as KClass<*>
+        get<Any>(type, null, null)
+    }
+}
+
+fun <T : Any> Koin.instantiate(type: KClass<T>): T {
+    val ctor = type.primaryConstructor
+        ?: throw IllegalStateException("No primary constructor present for $type")
+    val parameters = resolveParameters(ctor)
+    return ctor.callBy(parameters)
+}
+
 inline fun <reified T : Any> inject(qualifier: Qualifier? = null): Lazy<T> {
     return lazy { GlobalContext.get().koin.get<T>(T::class, qualifier, null) }
+}
+
+inline fun <reified T : Any> eager(qualifier: Qualifier? = null): T {
+    return GlobalContext.get().koin.get(T::class, qualifier, null)
 }
 
 fun <T : Any> Scope.createInstance(
     clazz: KClass<T>
 ): T {
     val ctor =
-        clazz.primaryConstructor ?: throw IllegalStateException("Cannot instanciate class without primary ctor: $clazz")
+        clazz.primaryConstructor ?: throw IllegalStateException("Cannot instantiate class without primary ctor: $clazz")
 
     val params = ctor.parameters.associateWith {
         val paramClass = it.type.classifier as? KClass<*>
-            ?: throw IllegalStateException("Cannot instanciate class with unclassified primary ctor parameters: $clazz $ctor")
+            ?: throw IllegalStateException("Cannot instantiate class with unclassified primary ctor parameters: $clazz $ctor")
         get<Any>(paramClass, null, null)
     }
 
-    params.forEach {
-        println(it.value::class.java)
-    }
-
-    val instance = ctor.callBy(params)
-
-    return instance
+    return ctor.callBy(params)
 }
 
 @Suppress("unused")
@@ -62,23 +77,3 @@ fun <T : Any> Module.singleInstance(clazz: KClass<T>, options: Options = Options
     bean.kind = Kind.Single
     this.declareDefinition(bean, options)
 }
-
-
-//<editor-fold desc="Koin Extensions">
-private val KoinLogger = LoggerFactory.getLogger(PackageNoOp::class.java.packageName + ".Koin")
-
-fun Koin.resolveParameters(fn: KFunction<*>): Map<KParameter, Any> {
-    return fn.parameters.associateWith { parameter ->
-        KoinLogger.trace("Resolving parameter: $parameter")
-        val type = parameter.type.classifier as KClass<*>
-        get<Any>(type, null, null)
-    }
-}
-
-fun <T : Any> Koin.instanciate(type: KClass<T>): T {
-    val ctor = type.primaryConstructor
-        ?: throw IllegalStateException("No primary constructor present for $type")
-    val parameters = resolveParameters(ctor)
-    return ctor.callBy(parameters)
-}
-//</editor-fold>

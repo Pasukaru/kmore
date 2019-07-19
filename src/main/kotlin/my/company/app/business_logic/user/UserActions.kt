@@ -1,5 +1,11 @@
 package my.company.app.business_logic.user
 
-object UserActions {
-    val createUser = CreateUserAction()
+import my.company.app.lib.containerModule
+
+class UserActions(
+    val createUser: CreateUserAction
+) {
+    companion object {
+        val MODULE = UserActions::class.containerModule()
+    }
 }
