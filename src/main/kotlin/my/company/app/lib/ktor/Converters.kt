@@ -2,7 +2,7 @@ package my.company.app.lib.ktor
 
 import io.ktor.features.DataConversion
 import io.ktor.util.DataConversionException
-import java.util.*
+import java.util.UUID
 
 fun DataConversion.Configuration.uuidConverter() {
     convert<UUID> {

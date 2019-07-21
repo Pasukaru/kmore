@@ -22,7 +22,7 @@ class SwaggerController : Controller {
     private val swaggerConfig = eager<SwaggerConfiguration>()
     private val swaggerJson: OutgoingContent.ByteArrayContent by lazy {
         val json = swaggerConfig.render().toByteArray(Charsets.UTF_8)
-        object: OutgoingContent.ByteArrayContent() {
+        object : OutgoingContent.ByteArrayContent() {
             override val contentType: ContentType = ContentType.Application.Json
             override fun bytes(): ByteArray = json
         }

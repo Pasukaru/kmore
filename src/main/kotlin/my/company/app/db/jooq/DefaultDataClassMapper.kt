@@ -5,7 +5,7 @@ import org.jooq.Record
 import java.math.BigDecimal
 import java.sql.Timestamp
 import java.time.Instant
-import java.util.*
+import java.util.UUID
 import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
 import kotlin.reflect.full.declaredMemberProperties

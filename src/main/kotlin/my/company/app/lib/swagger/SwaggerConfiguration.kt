@@ -183,5 +183,4 @@ class SwaggerConfiguration {
         val json = jsonSerializer.toJson(swagger)
         return json.value()
     }
-
 }

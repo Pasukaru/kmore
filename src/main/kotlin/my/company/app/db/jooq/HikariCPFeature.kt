@@ -54,5 +54,4 @@ class HikariCPFeature {
             return feature
         }
     }
-
 }

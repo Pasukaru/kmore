@@ -61,7 +61,6 @@ abstract class AbstractRepository<ID, TABLE : Table<RECORD>, RECORD : Record>(
         return result
     }
 
-
     protected suspend fun fetchOne(op: () -> Query): RECORD? = db {
         val query = op()
         val dialect = query.configuration().dialect()
@@ -79,7 +78,6 @@ abstract class AbstractRepository<ID, TABLE : Table<RECORD>, RECORD : Record>(
             else -> result.into(table)
         }
     }
-
 
     protected suspend fun execute(query: Query): Int = db {
         val dialect = query.configuration().dialect()

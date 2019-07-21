@@ -54,5 +54,4 @@ abstract class AbstractWebController(
         ).tag(tag.name).also(swaggerOp).build()
         get<LOCATION> { withAuthContext { this@get.getOp() } }
     }
-
 }
