@@ -12,6 +12,7 @@ buildscript {
         jooqVersion = '3.11.11'
         postgresDriverVersion = '42.2.5.jre7'
         flywayVersion = '5.2.4'
+        swaggerVersion = '2.9.2'
     }
 
     repositories {
@@ -68,6 +69,11 @@ dependencies {
     compile group: 'de.nielsfalk.ktor', name: 'ktor-swagger', version: '0.5.0'
     compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.0.17.Final'
     runtime group: 'org.glassfish', name: 'javax.el', version: '3.0.0' // Hibernate validator depends on this
+
+    compile group: 'io.springfox', name: 'springfox-swagger2', version: swaggerVersion
+    compile group: 'io.springfox', name: 'springfox-swagger-ui', version: swaggerVersion
+    compile group: 'org.springframework', name: 'spring-web', version: '3.0.2.RELEASE' // Springfox depends on this for HttpMethods
+
 
     compile group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.1.5.RELEASE'
 
