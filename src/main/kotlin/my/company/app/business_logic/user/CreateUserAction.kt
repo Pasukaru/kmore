@@ -28,7 +28,6 @@ class CreateUserAction : BusinessLogicAction<CreateUserRequest, UserRecord>() {
     private val passwordHelper: PasswordHelper by inject()
 
     override suspend fun action(request: CreateUserRequest): UserRecord {
-        validator.validate(request)
         if (repo.user.existsByEmailIgnoringCase(request.email)) throw UserByEmailAlreadyExistsException()
 
         return repo.user.insert(newUser(

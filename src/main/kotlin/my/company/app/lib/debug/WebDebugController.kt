@@ -1,6 +1,5 @@
 package my.company.app.lib.debug
 
-import getPathFromLocation
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.locations.Location
@@ -9,6 +8,7 @@ import io.ktor.response.respond
 import io.ktor.routing.Routing
 import my.company.app.lib.controller.AbstractController
 import my.company.app.web.Get
+import my.company.app.web.getPathFromLocation
 import springfox.documentation.schema.ModelRef
 import springfox.documentation.service.ResponseMessage
 import springfox.documentation.service.Tag

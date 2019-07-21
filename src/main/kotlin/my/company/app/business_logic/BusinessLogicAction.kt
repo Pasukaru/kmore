@@ -4,7 +4,7 @@ import my.company.app.lib.AuthorizationService
 import my.company.app.lib.inject
 import my.company.app.lib.logger
 import my.company.app.lib.repository.Repositories
-import my.company.app.lib.tx.TransactionContext
+import my.company.app.lib.TransactionContext
 import my.company.app.lib.validation.ValidationService
 import kotlin.coroutines.coroutineContext
 

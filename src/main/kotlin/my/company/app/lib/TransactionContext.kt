@@ -1,11 +1,9 @@
-package my.company.app.lib.tx
+package my.company.app.lib
 
 import com.zaxxer.hikari.pool.HikariPool
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
-import my.company.app.lib.eager
-import my.company.app.lib.logger
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
 import java.sql.Connection

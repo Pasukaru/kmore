@@ -3,13 +3,12 @@ package my.company.app.web
 import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
-import getEndpointInformation
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.response.respond
 import io.ktor.util.pipeline.PipelineContext
-import my.company.app.business_logic.session.InvalidLoginCredentialsException
+import my.company.app.lib.InvalidLoginCredentialsException
 import my.company.app.lib.InsufficientPermissionsException
 import my.company.app.lib.UserByEmailAlreadyExistsException
 import my.company.app.lib.logger

@@ -15,7 +15,7 @@ import my.company.app.conf.AppConfig
 import my.company.app.lib.inject
 import my.company.app.lib.logger
 import my.company.app.lib.tryOrNull
-import my.company.app.lib.tx.noTransaction
+import my.company.app.lib.noTransaction
 import my.company.app.web.AuthenticatedUser
 import my.company.app.web.SessionKey
 import my.company.app.web.auth.WebSessionPrincipal

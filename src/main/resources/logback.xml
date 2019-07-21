@@ -11,7 +11,7 @@
 
     <logger name="org.reflections.Reflections" level="WARN"/>
     <logger name="org.hibernate" level="WARN"/>
-    <logger name="my.company.app.lib.tx.TransactionContext" level="INFO"/>
+    <logger name="my.company.app.lib.TransactionContext" level="INFO"/>
     <logger name="ktor.application" level="INFO"/>
     <logger name="org.jooq" level="OFF"/>
     <logger name="org.eclipse.jetty" level="INFO"/>

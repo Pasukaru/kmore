@@ -1,7 +1,7 @@
 package my.company.app.web.controller.session
 
 import my.company.app.business_logic.session.LoginRequest
-import my.company.app.business_logic.session.LoginResponse
+import my.company.jooq.tables.records.SessionRecord
 
 class WebSessionMapper {
 
@@ -10,7 +10,7 @@ class WebSessionMapper {
         passwordClean = request.password
     )
 
-    fun res(response: LoginResponse) = WebLoginResponse(
+    fun res(response: SessionRecord) = WebLoginResponse(
         id = response.id
     )
 }

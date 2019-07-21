@@ -23,3 +23,7 @@
 ## Swagger
 
 http://localhost:8080/swagger/index.html?url=swagger.json
+
+## TODOs
+
+* Testing (Unit, Integration)

@@ -1,7 +1,7 @@
 package my.company.app.lib.repository
 
 import my.company.app.lib.logger
-import my.company.app.lib.tx.TransactionContext
+import my.company.app.lib.TransactionContext
 import org.jooq.DSLContext
 import org.jooq.Field
 import org.jooq.Query

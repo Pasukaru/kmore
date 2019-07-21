@@ -1,18 +1,21 @@
 package my.company.app.web.controller
 
-import getNameFromLocation
-import getPathFromLocation
 import io.ktor.application.ApplicationCall
+import io.ktor.application.call
+import io.ktor.http.HttpMethod
 import io.ktor.locations.Location
 import io.ktor.locations.get
 import io.ktor.locations.post
 import io.ktor.routing.Routing
 import io.ktor.util.pipeline.PipelineContext
 import my.company.app.lib.controller.AbstractController
+import my.company.app.web.EndpointInformation
 import my.company.app.web.Get
 import my.company.app.web.Post
+import my.company.app.web.getNameFromLocation
+import my.company.app.web.getPathFromLocation
+import my.company.app.web.withAuthContext
 import springfox.documentation.service.Tag
-import withAuthContext
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 @Location(WebLocation.PATH)
@@ -31,6 +34,13 @@ abstract class AbstractWebController(
         const val WEB_CONTROLLER_PREFIX = "Web"
     }
 
+    protected inline fun <reified LOCATION> ApplicationCall.setEndpointInformation(method: HttpMethod) {
+        attributes.put(EndpointInformation.key, EndpointInformation(
+            method = method,
+            locationClass = LOCATION::class
+        ))
+    }
+
     @Suppress("EXPERIMENTAL_API_USAGE")
     protected inline fun <reified LOCATION : Any> Routing.documentedPost(
         noinline swaggerOp: Post.() -> Unit,
@@ -40,7 +50,10 @@ abstract class AbstractWebController(
             path = getPathFromLocation(LOCATION::class),
             name = getNameFromLocation(LOCATION::class)
         ).tag(tag.name).also(swaggerOp).build()
-        post<LOCATION> { withAuthContext { this@post.postOp() } }
+        post<LOCATION> {
+            call.setEndpointInformation<LOCATION>(HttpMethod.Post)
+            withAuthContext { this@post.postOp() }
+        }
     }
 
     @Suppress("EXPERIMENTAL_API_USAGE")
@@ -52,6 +65,9 @@ abstract class AbstractWebController(
             path = getPathFromLocation(LOCATION::class),
             name = getNameFromLocation(LOCATION::class)
         ).tag(tag.name).also(swaggerOp).build()
-        get<LOCATION> { withAuthContext { this@get.getOp() } }
+        get<LOCATION> {
+            call.setEndpointInformation<LOCATION>(HttpMethod.Get)
+            withAuthContext { this@get.getOp() }
+        }
     }
 }

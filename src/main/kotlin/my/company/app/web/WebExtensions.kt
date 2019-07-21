@@ -1,41 +1,14 @@
-@file:Suppress("MatchingDeclarationName")
+package my.company.app.web
 
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.auth.authentication
-import io.ktor.http.HttpMethod
 import io.ktor.locations.Location
-import io.ktor.util.AttributeKey
 import io.ktor.util.pipeline.PipelineContext
 import kotlinx.coroutines.withContext
 import my.company.app.web.auth.WebSessionPrincipal
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
-
-data class EndpointInformation(
-    val method: HttpMethod,
-    val locationClass: KClass<*>,
-    val location: String,
-    val requestBody: KClass<*>?,
-    val responseBody: KClass<*>?
-) {
-    companion object Attribute {
-        val key: AttributeKey<EndpointInformation> = AttributeKey(EndpointInformation::class.java.canonicalName)
-    }
-
-    override fun toString(): String {
-        val str = StringBuilder(this::class.simpleName)
-            .append("(")
-            .append(method.value)
-
-        requestBody?.let { str.append(" Request[").append(it.simpleName).append("]") }
-        responseBody?.let { str.append(" Response[").append(it.simpleName).append("]") }
-
-        str.append(")")
-
-        return str.toString()
-    }
-}
 
 suspend inline fun <T> PipelineContext<*, ApplicationCall>.withAuthContext(
     crossinline block: suspend PipelineContext<*, ApplicationCall>.() -> T
