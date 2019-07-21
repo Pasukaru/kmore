@@ -1,12 +1,12 @@
 package my.company.app.web.controller.user
 
-import de.nielsfalk.ktor.swagger.version.shared.Group
 import io.ktor.locations.Location
+import io.swagger.annotations.ApiOperation
 import java.util.UUID
 
 @Suppress("EXPERIMENTAL_API_USAGE")
-@Group(WebUserController.CONTROLLER_NAME)
 @Location(WebUserController.LOCATION_PREFIX)
+@ApiOperation("GetUsers")
 class WebGetUsersLocation
 
 data class WebGetUsersResponse(

@@ -2,11 +2,6 @@
 
 package my.company.app
 
-import de.nielsfalk.ktor.swagger.SwaggerSupport
-import de.nielsfalk.ktor.swagger.version.shared.Contact
-import de.nielsfalk.ktor.swagger.version.shared.Information
-import de.nielsfalk.ktor.swagger.version.v2.Swagger
-import de.nielsfalk.ktor.swagger.version.v3.OpenApi
 import io.ktor.application.Application
 import io.ktor.application.install
 import io.ktor.features.CallLogging
@@ -29,6 +24,7 @@ import my.company.app.lib.ktor.StartupLog
 import my.company.app.lib.ktor.uuidConverter
 import my.company.app.lib.logger
 import my.company.app.lib.repository.Repositories
+import my.company.app.lib.swagger.SwaggerConfiguration
 import my.company.app.web.GlobalWebErrorHandler
 import my.company.app.web.WebRouting
 import my.company.app.web.jacksonWeb
@@ -36,6 +32,8 @@ import my.company.app.web.swagger
 import org.koin.dsl.module
 import org.koin.ktor.ext.Koin
 import org.reflections.Reflections
+import springfox.documentation.builders.ParameterBuilder
+import springfox.documentation.schema.ModelRef
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneOffset
@@ -91,6 +89,20 @@ fun Application.mainModule() {
         modules(
             listOf(
                 module {
+                    single {
+                        val authHeader = ParameterBuilder()
+                            .name("X-Auth-Token")
+                            .description("Authentication token")
+                            .modelRef(ModelRef("uuid"))
+                            .parameterType("header")
+                            .required(false)
+                            .allowEmptyValue(false)
+                            .allowMultiple(false)
+                            .build()
+                            .let { listOf(it) }
+                        SwaggerConfiguration()
+                            .registerOperationParameterInterceptor { authHeader }
+                    }
                     single { appConfig }
                     single { AuthorizationService() }
                     single { GlobalWebErrorHandler() }
@@ -117,32 +129,6 @@ fun Application.mainModule() {
 
     install(HikariCPFeature)
 
-    install(SwaggerSupport) {
-        forwardRoot = true
-        val information = Information(
-            version = "0.1",
-            title = "sample api implemented in ktor",
-            description = "This is a sample which combines [ktor](https://github.com/Kotlin/ktor) with [swaggerUi](https://swagger.io/). You find the sources on [github](https://github.com/nielsfalk/ktor-swagger)",
-            contact = Contact(
-                name = "Niels Falk",
-                url = "https://nielsfalk.de"
-            )
-        )
-        swagger = Swagger().apply {
-            info = information
-            definitions["UUID"] = mutableMapOf(
-                "type" to "string",
-                "name" to "UUID"
-            )
-        }
-        openApi = OpenApi().apply {
-            info = information
-            components.schemas["UUID"] = mutableMapOf(
-                "type" to "string",
-                "name" to "UUID"
-            )
-        }
-    }
     install(WebRouting)
     install(StatusPages) {
         exception<Throwable> { error ->

@@ -15,12 +15,11 @@ import my.company.app.conf.AppConfig
 import my.company.app.lib.inject
 import my.company.app.lib.logger
 import my.company.app.lib.tryOrNull
-import my.company.app.lib.tx.databaseConnectionWithoutTransaction
+import my.company.app.lib.tx.noTransaction
 import my.company.app.web.AuthenticatedUser
 import my.company.app.web.SessionKey
 import my.company.app.web.auth.WebSessionPrincipal
 import my.company.app.web.isSwaggerRequest
-import my.company.app.web.isWebRequest
 import java.util.UUID
 
 object AuthInterceptor : WebInterceptor() {
@@ -43,9 +42,9 @@ object AuthInterceptor : WebInterceptor() {
             return
         }
 
-        if (!isWebRequest()) return
+        // if (!isWebRequest()) return
 
-        databaseConnectionWithoutTransaction {
+        noTransaction {
             val token = call.request.header("X-Auth-Token")?.tryOrNull { UUID.fromString(it) }
             if (token != null) {
                 val session = repositories.session.findById(token)

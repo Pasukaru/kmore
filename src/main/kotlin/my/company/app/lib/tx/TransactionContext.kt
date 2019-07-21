@@ -70,16 +70,19 @@ class TransactionContext(
     }
 
     suspend fun <T> execute(op: suspend Connection.() -> T): T {
+        val start = System.currentTimeMillis()
+
         logger.trace("$this: LOCK ${coroutineContext[TransactionContext]}")
-        // mutex.lock()
-        logger.trace("$this: LOCKED ${coroutineContext[TransactionContext]}")
+        mutex.lock()
+        logger.trace("$this: LOCKED ${coroutineContext[TransactionContext]} (${System.currentTimeMillis() - start}ms)")
 
         return try {
             expectActive()
             op(connection)
         } finally {
             logger.trace("$this: UNLOCKED ${coroutineContext[TransactionContext]}")
-            // mutex.unlock()
+            mutex.unlock()
+            val time = System.currentTimeMillis() - start
         }
     }
 
@@ -111,7 +114,7 @@ suspend fun <T> transaction(block: suspend CoroutineScope.() -> T): T {
     }
 }
 
-suspend fun <T> databaseConnectionWithoutTransaction(block: suspend CoroutineScope.() -> T): T {
+suspend fun <T> noTransaction(block: suspend CoroutineScope.() -> T): T {
     val pool = eager<HikariPool>()
     val tx = TransactionContext(pool.connection)
     try {
