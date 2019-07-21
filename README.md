@@ -7,6 +7,8 @@
     * TODO: Configurable data source
 * (basic) Transaction management
     * TODO: More control  
+* Database migrations (Flyway)
+* Query Building & Execution (JOOQ, codegen from database migrations) 
 * DTO validation (Hibernate validator)
 * API Documentation (Swagger)
 * Global error handling
