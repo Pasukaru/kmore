@@ -2,12 +2,7 @@ package my.company.app.conf
 
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigFactory
-import io.ktor.application.Application
-import io.ktor.application.ApplicationFeature
-import io.ktor.config.ApplicationConfig
-import io.ktor.config.HoconApplicationConfig
 import io.ktor.config.tryGetString
-import io.ktor.util.AttributeKey
 import java.io.File
 import java.io.InputStream
 import java.net.URL
@@ -15,17 +10,15 @@ import java.util.Collections
 import java.util.Enumeration
 
 @Suppress("EXPERIMENTAL_API_USAGE")
-object AppConfigFeature : ApplicationFeature<Application, ApplicationConfig, AppConfig> {
+object AppConfigLoader {
     private val SYSTEM_CLASS_LOADER = ClassLoader.getSystemClassLoader()
     private val FILE_CLASS_LOADER = FileClassLoader()
 
-    override val key: AttributeKey<AppConfig> = AttributeKey(ApplicationConfig::class.java.canonicalName)
-
-    override fun install(pipeline: Application, configure: ApplicationConfig.() -> Unit): AppConfig {
+    fun load(): AppConfig {
         val applicationConfig = load("application.conf")
         val includeProfile = System.getenv("PROFILE")?.takeIf { it.isNotBlank() }
         val mergedConfig = includeProfile?.let { applicationConfig.includeProfile(it) } ?: applicationConfig
-        return AppConfig(HoconApplicationConfig(mergedConfig))
+        return AppConfig(mergedConfig)
     }
 
     private fun load(name: String): Config {

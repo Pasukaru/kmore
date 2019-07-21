@@ -82,7 +82,6 @@ class TransactionContext(
         } finally {
             logger.trace("$this: UNLOCKED ${coroutineContext[TransactionContext]}")
             mutex.unlock()
-            val time = System.currentTimeMillis() - start
         }
     }
 

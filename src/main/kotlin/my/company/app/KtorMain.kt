@@ -14,7 +14,7 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import my.company.app.business_logic.session.SessionActions
 import my.company.app.business_logic.user.UserActions
-import my.company.app.conf.AppConfigFeature
+import my.company.app.conf.AppConfigLoader
 import my.company.app.db.jooq.HikariCPFeature
 import my.company.app.lib.AuthorizationService
 import my.company.app.lib.PasswordHelper
@@ -25,6 +25,7 @@ import my.company.app.lib.ktor.uuidConverter
 import my.company.app.lib.logger
 import my.company.app.lib.repository.Repositories
 import my.company.app.lib.swagger.SwaggerConfiguration
+import my.company.app.lib.validation.ValidationService
 import my.company.app.web.GlobalWebErrorHandler
 import my.company.app.web.WebRouting
 import my.company.app.web.jacksonWeb
@@ -40,6 +41,8 @@ import java.time.ZoneOffset
 import java.util.TimeZone
 import java.util.concurrent.TimeUnit
 import javax.validation.Validation
+
+private val appConfig = AppConfigLoader.load()
 
 class KtorMain {
 
@@ -60,7 +63,7 @@ class KtorMain {
     fun main() {
         embeddedServer(
             Netty,
-            port = 8080,
+            port = appConfig.ktorPort,
             module = Application::mainModule
         ).gracefulStart()
     }
@@ -73,15 +76,11 @@ class KtorMain {
         Thread.currentThread().join()
         return this
     }
-
-    // private val mainModule: Application.() -> Unit =
-
 }
 
 fun Application.mainModule() {
     TimeZone.setDefault(TimeZone.getTimeZone(ZoneOffset.UTC))
 
-    val appConfig = install(AppConfigFeature)
     install(CallLogging)
     install(Locations)
 
@@ -89,6 +88,7 @@ fun Application.mainModule() {
         modules(
             listOf(
                 module {
+                    single { appConfig }
                     single {
                         val authHeader = ParameterBuilder()
                             .name("X-Auth-Token")
@@ -103,13 +103,13 @@ fun Application.mainModule() {
                         SwaggerConfiguration()
                             .registerOperationParameterInterceptor { authHeader }
                     }
-                    single { appConfig }
                     single { AuthorizationService() }
                     single { GlobalWebErrorHandler() }
                     single { PasswordHelper() }
                     val validationFactory = Validation.buildDefaultValidatorFactory()!!
                     single { validationFactory }
                     single { validationFactory.validator }
+                    single { ValidationService() }
                 },
                 Repositories.MODULE,
                 SessionActions.MODULE,
@@ -138,7 +138,9 @@ fun Application.mainModule() {
         }
     }
 
-    install(ApplicationWarmup)
+    if (!appConfig.isDev && !appConfig.isTest) {
+        install(ApplicationWarmup)
+    }
 
     install(StartupLog)
 }

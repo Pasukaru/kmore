@@ -20,8 +20,10 @@ import my.company.app.web.AuthenticatedUser
 import my.company.app.web.SessionKey
 import my.company.app.web.auth.WebSessionPrincipal
 import my.company.app.web.isSwaggerRequest
+import my.company.app.web.isWebRequest
 import java.util.UUID
 
+@Suppress("EXPERIMENTAL_API_USAGE")
 object AuthInterceptor : WebInterceptor() {
 
     private val logger = logger<AuthInterceptor>()
@@ -33,7 +35,6 @@ object AuthInterceptor : WebInterceptor() {
         val start = System.currentTimeMillis()
 
         if (isSwaggerRequest()) {
-            @Suppress("EXPERIMENTAL_API_USAGE")
             if (call.request.basicAuthenticationCredentials(Charsets.UTF_8) != UserPasswordCredential("swagger", appConfig.swaggerPassword)) {
                 call.response.header(HttpHeaders.WWWAuthenticate, "Basic realm=\"swagger\"")
                 call.respond(HttpStatusCode.Unauthorized)
@@ -42,7 +43,7 @@ object AuthInterceptor : WebInterceptor() {
             return
         }
 
-        // if (!isWebRequest()) return
+        if (!isWebRequest()) return
 
         noTransaction {
             val token = call.request.header("X-Auth-Token")?.tryOrNull { UUID.fromString(it) }

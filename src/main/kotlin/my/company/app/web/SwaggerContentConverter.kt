@@ -30,7 +30,7 @@ class SwaggerContentConverter(objectMapper: ObjectMapper) : ContentConverter {
 
 fun PipelineContext<*, ApplicationCall>.isSwaggerRequest(): Boolean {
     val uri = call.request.local.uri
-    return uri.startsWith("/apidocs")
+    return uri.startsWith("/swagger")
 }
 
 fun ContentNegotiation.Configuration.swagger(

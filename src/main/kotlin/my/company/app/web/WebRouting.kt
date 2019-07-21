@@ -60,8 +60,6 @@ object WebRouting : ApplicationFeature<Application, Unit, Unit> {
                 koin.instantiate(SwaggerController::class).routing(this)
             }
         }
-        val swagger = eager<SwaggerConfiguration>().render()
-        logger.debug("Swagger:\n$swagger")
         logger.trace("WebRouting initialized in ${time}ms")
     }
 }

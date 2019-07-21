@@ -1,8 +1,13 @@
 package my.company.app.conf
 
-import io.ktor.config.ApplicationConfig
+import com.typesafe.config.Config
 
 @Suppress("EXPERIMENTAL_API_USAGE")
-class AppConfig(config: ApplicationConfig) {
-    val swaggerPassword: String = config.property("swagger.password").getString()
+class AppConfig(config: Config) {
+    val ktorPort = config.getInt("ktor.port")
+
+    val swaggerPassword: String = config.getString("swagger.password")
+    val isDev: Boolean = config.getString("ktor.environment") != "dev"
+    val isTest: Boolean = config.getString("ktor.environment") != "test"
+    val isProd: Boolean = !isDev && !isTest
 }

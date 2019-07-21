@@ -20,7 +20,7 @@ data class CreateUserRequest(
     @field:NotBlank
     val lastName: String,
 
-    @Password
+    @field:Password
     val passwordClean: String
 )
 

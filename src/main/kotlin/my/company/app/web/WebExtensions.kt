@@ -4,7 +4,6 @@ import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.auth.authentication
 import io.ktor.http.HttpMethod
-import io.ktor.http.Parameters
 import io.ktor.locations.Location
 import io.ktor.util.AttributeKey
 import io.ktor.util.pipeline.PipelineContext
@@ -63,10 +62,4 @@ fun getPathFromLocation(locationType: KClass<*>): String {
 @Suppress("EXPERIMENTAL_API_USAGE")
 fun getNameFromLocation(locationType: KClass<*>): String {
     return locationType.simpleName!!.removePrefix("Web").removeSuffix("Location")
-}
-
-@Suppress("UNCHECKED_CAST")
-inline fun <reified T> mapParameters(parameters: Parameters): T {
-    if (T::class == Unit::class) return Unit as T
-    throw NotImplementedError()
 }

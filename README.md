@@ -1,6 +1,23 @@
-How to run: Create a run configuration for `KtorMain`
+# Scaffolding project for a Ktor server application
 
-Swagger:
+## Features
 
-http://localhost:8080/apidocs/index.html?url=swagger.json
-∞
+* Dependency Injection (Koin)
+* Database connection pooling (Hikari)
+    * TODO: Configurable data source
+* (basic) Transaction management
+    * TODO: More control  
+* DTO validation (Hibernate validator)
+* API Documentation (Swagger)
+* Global error handling
+* Authentication (via token in custom header `X-Auth-Token`)
+* Authorization
+
+## How to run: 
+
+1. Create a run configuration for `my.company.app.KtorMainKt`
+2. Add environment variable `PROFILE=local-dev`
+
+## Swagger
+
+http://localhost:8080/swagger/index.html?url=swagger.json

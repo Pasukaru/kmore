@@ -141,10 +141,10 @@ class Post(
     }
 
     inline fun <reified T : Any> res() = res(T::class)
-    fun res(type: KClass<*>) = res(HttpStatusCode.OK, type)
+    fun res(type: KClass<*>) = res(HttpStatusCode.Created, type)
 
     inline fun <reified T : Any> resList() = resList(T::class)
-    fun resList(type: KClass<*>) = resList(HttpStatusCode.OK, type)
+    fun resList(type: KClass<*>) = resList(HttpStatusCode.Created, type)
 }
 
 class Get(
@@ -159,8 +159,8 @@ class Get(
     }
 
     inline fun <reified T : Any> res() = res(T::class)
-    fun res(type: KClass<*>) = res(HttpStatusCode.Created, type)
+    fun res(type: KClass<*>) = res(HttpStatusCode.OK, type)
 
     inline fun <reified T : Any> resList() = resList(T::class)
-    fun resList(type: KClass<*>) = resList(HttpStatusCode.Created, type)
+    fun resList(type: KClass<*>) = resList(HttpStatusCode.OK, type)
 }

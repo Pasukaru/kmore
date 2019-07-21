@@ -117,10 +117,6 @@ class SwaggerConfiguration {
         return operationParameterInterceptors.flatMap { it(context) }
     }
 
-    fun parseParameters(clazz: KClass<*>): List<Parameter> {
-        return emptyList()
-    }
-
     fun init(): Documentation {
         val apiListing = ApiListing(
             "apiVersion",
