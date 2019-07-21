@@ -42,7 +42,15 @@ abstract class AbstractRepository<ID, TABLE : Table<RECORD>, RECORD : Record>(
         return record
     }
 
-    open suspend fun update(record: RECORD, dialect: SQLDialect = this.dialect): RECORD = throw NotImplementedError()
+    @Suppress("UNCHECKED_CAST")
+    protected open val RECORD.id : ID get() = this["id"] as ID
+
+    open suspend fun update(record: RECORD, dialect: SQLDialect = this.dialect): RECORD {
+        val q = dsl.update(table).set(record).where(primaryKey.eq(record.id))
+        val rows = execute(q)
+        if (rows != 1) throw SQLDataException("Failed to update row")
+        return record
+    }
 
     open suspend fun deleteById(id: ID): Unit = db {
         val result = connectionDsl().deleteFrom(table).where(primaryKey.eq(id)).execute()
