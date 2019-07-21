@@ -1,4 +1,4 @@
-package my.company.app.lib.ktor.web
+package my.company.app.web
 
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCallPipeline
@@ -9,9 +9,9 @@ import io.ktor.util.AttributeKey
 import my.company.app.KtorMain
 import my.company.app.lib.controller.Controller
 import my.company.app.lib.instantiate
-import my.company.app.lib.ktor.web.interceptor.AuthInterceptor
-import my.company.app.lib.ktor.web.interceptor.CorsInterceptor
 import my.company.app.lib.logger
+import my.company.app.web.interceptor.AuthInterceptor
+import my.company.app.web.interceptor.CorsInterceptor
 import org.koin.ktor.ext.getKoin
 import java.lang.reflect.Modifier
 import kotlin.reflect.KClass
@@ -50,6 +50,6 @@ object WebRouting : ApplicationFeature<Application, Unit, Unit> {
                 initControllers()
             }
         }
-        logger.debug("WebRouting initialized in ${time}ms")
+        logger.trace("WebRouting initialized in ${time}ms")
     }
 }

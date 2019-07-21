@@ -2,7 +2,7 @@ version: '3.2'
 volumes:
   data:
 services:
-  postgres:
+  my_project_postgres_unsafe:
     image: postgres:9.6.14-alpine
     container_name: my_project_postgres_unsafe
     command: postgres -p 10001 -c config_file=/postgresql-custom.conf

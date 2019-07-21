@@ -1,5 +1,6 @@
 package my.company.app.lib.repository
 
+import my.company.app.lib.logger
 import my.company.app.lib.tx.TransactionContext
 import org.jooq.DSLContext
 import org.jooq.Field
@@ -16,6 +17,8 @@ import kotlin.reflect.full.isSubclassOf
 abstract class AbstractRepository<ID, TABLE : Table<RECORD>, RECORD : Record>(
     table: TABLE
 ) : Repository {
+
+    protected val logger = this::class.logger()
 
     @Suppress("UNCHECKED_CAST")
     protected val table: TABLE = table.`as`(table.unqualifiedName) as TABLE
@@ -47,8 +50,15 @@ abstract class AbstractRepository<ID, TABLE : Table<RECORD>, RECORD : Record>(
     }
 
     protected suspend fun <T> db(block: suspend Connection.() -> T): T {
+        val start = System.currentTimeMillis()
+
         val tx = coroutineContext[TransactionContext] ?: throw IllegalStateException("No active database session")
-        return tx.execute(block)
+        val result = tx.execute(block)
+
+        val time = System.currentTimeMillis() - start
+        logger.trace("Query completed in ${time}ms")
+
+        return result
     }
 
 

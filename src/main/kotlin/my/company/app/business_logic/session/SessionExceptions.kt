@@ -2,4 +2,6 @@
 
 package my.company.app.business_logic.session
 
-class InvalidLoginCredentialsException : RuntimeException()
+import my.company.app.lib.ServiceException
+
+class InvalidLoginCredentialsException : ServiceException("{login.credentials.invalid}")

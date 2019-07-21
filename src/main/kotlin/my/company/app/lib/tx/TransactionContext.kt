@@ -2,14 +2,9 @@ package my.company.app.lib.tx
 
 import com.zaxxer.hikari.pool.HikariPool
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 import my.company.app.lib.eager
-import my.company.app.lib.inject
 import my.company.app.lib.logger
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
@@ -76,7 +71,7 @@ class TransactionContext(
 
     suspend fun <T> execute(op: suspend Connection.() -> T): T {
         logger.trace("$this: LOCK ${coroutineContext[TransactionContext]}")
-        mutex.lock()
+        // mutex.lock()
         logger.trace("$this: LOCKED ${coroutineContext[TransactionContext]}")
 
         return try {
@@ -84,7 +79,7 @@ class TransactionContext(
             op(connection)
         } finally {
             logger.trace("$this: UNLOCKED ${coroutineContext[TransactionContext]}")
-            mutex.unlock()
+            // mutex.unlock()
         }
     }
 
@@ -94,31 +89,6 @@ class TransactionContext(
     fun afterCompletion(block: () -> Unit) = afterCompletionHooks.add(block)
 
     override fun toString(): String = "TransactionContext[$id]"
-}
-
-fun <T> CoroutineScope.transactionAsync(block: suspend CoroutineScope.() -> T): Deferred<T> {
-    // Use DB IO thread to await connection and begin transaction
-    return async(DbScheduler) {
-        val pool by inject<HikariPool>()
-
-        val tx = TransactionContext(pool.connection)
-
-        try {
-            tx.beginTransaction()
-
-            // Switch back to main threads for the transaction
-            val result = async(Dispatchers.Default + tx, CoroutineStart.DEFAULT, block).await()
-
-            tx.commit()
-
-            result
-        } catch (e: Throwable) {
-            tx.rollback()
-            throw e
-        } finally {
-            pool.evictConnection(tx.connection)
-        }
-    }
 }
 
 suspend fun <T> transaction(block: suspend CoroutineScope.() -> T): T {
@@ -141,7 +111,7 @@ suspend fun <T> transaction(block: suspend CoroutineScope.() -> T): T {
     }
 }
 
-suspend fun <T> withoutTransaction(block: suspend CoroutineScope.() -> T): T {
+suspend fun <T> databaseConnectionWithoutTransaction(block: suspend CoroutineScope.() -> T): T {
     val pool = eager<HikariPool>()
     val tx = TransactionContext(pool.connection)
     try {

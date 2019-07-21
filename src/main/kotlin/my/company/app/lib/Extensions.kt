@@ -1,5 +1,10 @@
 package my.company.app.lib
 
+import io.ktor.application.ApplicationCall
+import io.ktor.application.ApplicationFeature
+import io.ktor.application.featureOrNull
+import io.ktor.application.install
+import io.ktor.util.pipeline.Pipeline
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import kotlin.reflect.KClass
@@ -38,24 +43,8 @@ val Throwable.rootCause: Throwable
         return root
     }
 
-object Extensions {
-    fun captureStackTrace(): Array<StackTraceElement> {
-        val thisServiceName = this.javaClass.canonicalName
-        val current = Thread.currentThread().stackTrace
-            ?.filterNotNull()
-            ?.toMutableList()
-            // Remove Thread.getStackTrace()
-            ?.let { it.subList(1, it.size) }
-            // Remove calls to this service, we don't need them
-            ?.filter { it.className != thisServiceName }
-            // Add a hint that the next part of the stack trace is from another thread
-            ?.let { arrayOf(StackTraceElement("Original", "Thread", "NoSource", 0)) + it }
-            ?: emptyArray()
-        return current
-    }
-
-    fun appendStackTrace(e: Throwable, history: Array<StackTraceElement>) {
-        e.stackTrace += history
-    }
+fun <A : Pipeline<*, ApplicationCall>, B : Any, F : Any> A.getOrInstall(
+    feature: ApplicationFeature<A, B, F>
+): F {
+    return featureOrNull(feature) ?: install(feature)
 }
-

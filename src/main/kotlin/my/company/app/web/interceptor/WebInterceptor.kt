@@ -1,4 +1,4 @@
-package my.company.app.lib.ktor.web.interceptor
+package my.company.app.web.interceptor
 
 import io.ktor.application.ApplicationCall
 import io.ktor.routing.Routing

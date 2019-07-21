@@ -1,4 +1,4 @@
-package my.company.app.lib.ktor.web.controller.session
+package my.company.app.web.controller.session
 
 import de.nielsfalk.ktor.swagger.version.shared.Group
 import io.ktor.locations.Location
@@ -6,8 +6,8 @@ import java.util.UUID
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 @Group(WebSessionController.CONTROLLER_NAME)
-@Location(WebSessionController.PATH_PREFIX)
-object WebLoginPath
+@Location(WebSessionController.LOCATION_PREFIX)
+object WebLoginLocation
 
 data class WebLoginRequest(
     val email: String,

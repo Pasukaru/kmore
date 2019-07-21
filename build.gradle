@@ -58,6 +58,7 @@ dependencies {
     compile group: 'io.ktor', name: 'ktor-server-core', version: ktorVersion
     compile group: 'io.ktor', name: 'ktor-server-netty', version: ktorVersion
     compile group: 'io.ktor', name: 'ktor-websockets', version: ktorVersion
+
     implementation group: 'io.ktor', name: 'ktor-jackson', version: ktorVersion
     implementation group: 'io.ktor', name: 'ktor-locations', version: ktorVersion
     compile group: 'org.koin', name: 'koin-ktor', version: koinVersion
@@ -65,6 +66,11 @@ dependencies {
     compile group: 'org.flywaydb', name: 'flyway-core', version: flywayVersion
     compile group: 'com.zaxxer', name: 'HikariCP', version: '3.3.1'
     compile group: 'de.nielsfalk.ktor', name: 'ktor-swagger', version: '0.5.0'
+    compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.0.17.Final'
+    runtime group: 'org.glassfish', name: 'javax.el', version: '3.0.0' // Hibernate validator depends on this
+
+    compile group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.1.5.RELEASE'
+
 
     compile("ch.qos.logback:logback-classic:1.2.3")
     compile group: 'org.reflections', name: 'reflections', version: '0.9.11'

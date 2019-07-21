@@ -1,4 +1,4 @@
-package my.company.app.lib.ktor.web.controller.session
+package my.company.app.web.controller.session
 
 import my.company.app.business_logic.session.LoginRequest
 import my.company.app.business_logic.session.LoginResponse

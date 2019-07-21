@@ -1,7 +1,7 @@
-package my.company.app.lib.ktor.web.controller.user
+package my.company.app.web.controller.user
 
 import my.company.app.business_logic.user.CreateUserRequest
-import my.company.app.business_logic.user.CreateUserResponse
+import my.company.jooq.tables.records.UserRecord
 
 class WebUserMapper {
 
@@ -12,10 +12,19 @@ class WebUserMapper {
         passwordClean = request.password
     )
 
-    fun res(response: CreateUserResponse) = WebCreateUserResponse(
+    fun res(response: UserRecord) = WebCreateUserResponse(
         id = response.id,
         email = response.lastName,
         firstName = response.firstName,
         lastName = response.lastName
     )
+
+    fun res(response: List<UserRecord>) = response.map { user ->
+        WebGetUsersResponse(
+            id = user.id,
+            email = user.lastName,
+            firstName = user.firstName,
+            lastName = user.lastName
+        )
+    }
 }
