@@ -23,6 +23,7 @@ import my.company.app.db.jooq.HikariCPFeature
 import my.company.app.lib.AuthorizationService
 import my.company.app.lib.PasswordHelper
 import my.company.app.lib.TransactionService
+import my.company.app.lib.containerModule
 import my.company.app.lib.eager
 import my.company.app.lib.ktor.ApplicationWarmup
 import my.company.app.lib.ktor.StartupLog
@@ -32,15 +33,13 @@ import my.company.app.lib.repository.Repositories
 import my.company.app.lib.swagger.SwaggerConfiguration
 import my.company.app.lib.validation.ValidationService
 import my.company.app.web.GlobalWebErrorHandler
-import my.company.app.web.WebRouting
+import my.company.app.web.WebRoutingFeature
 import org.koin.core.context.GlobalContext
 import org.koin.dsl.module
 import org.koin.ktor.ext.Koin
 import org.reflections.Reflections
 import springfox.documentation.builders.ParameterBuilder
 import springfox.documentation.schema.ModelRef
-import java.time.Duration
-import java.time.Instant
 import java.time.ZoneOffset
 import java.util.TimeZone
 import java.util.concurrent.TimeUnit
@@ -58,9 +57,9 @@ class KtorMain {
         val logger = logger<KtorMain>()
 
         init {
-            val start = Instant.now()
+            val start = System.currentTimeMillis()
             REFLECTIONS = Reflections(PackageNoOp::class.java.`package`.name)
-            logger.info("Classpath scanning took: ${Duration.between(start, Instant.now())}")
+            logger.info("Classpath scanning took: ${System.currentTimeMillis() - start}ms")
         }
     }
 
@@ -121,9 +120,9 @@ fun Application.mainModule() {
                     single { ValidationService() }
                     single { TransactionService() }
                 },
-                Repositories.MODULE,
-                SessionActions.MODULE,
-                UserActions.MODULE
+                containerModule<Repositories>(),
+                containerModule<SessionActions>(),
+                containerModule<UserActions>()
             )
         )
     }
@@ -144,7 +143,7 @@ fun Application.mainModule() {
 
     install(HikariCPFeature)
 
-    install(WebRouting)
+    install(WebRoutingFeature)
     install(StatusPages) {
         exception<Throwable> { error ->
             if (!eager<GlobalWebErrorHandler>().handleError(this, error)) {

@@ -8,10 +8,12 @@ import my.company.app.business_logic.session.LoginAction
 import my.company.app.business_logic.session.LoginRequest
 import my.company.app.lib.InvalidLoginCredentialsException
 import my.company.app.lib.validation.ValidationService
+import my.company.app.test.declareMock
+import my.company.app.test.declareSpy
 import my.company.app.web.GlobalWebErrorHandler
 import my.company.app.web.controller.BaseWebControllerTest
 import my.company.jooq.tables.records.SessionRecord
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 import org.mockito.Mockito.times
 import java.util.UUID

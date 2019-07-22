@@ -5,8 +5,9 @@ import assertk.assertions.isEqualTo
 import io.ktor.http.HttpStatusCode
 import my.company.app.business_logic.user.GetUsersAction
 import my.company.app.db.newUser
+import my.company.app.test.declareMock
 import my.company.app.web.controller.BaseWebControllerTest
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.mockito.Mockito
 
 class WebGetUsersTest : BaseWebControllerTest(WebGetUsersLocation::class) {

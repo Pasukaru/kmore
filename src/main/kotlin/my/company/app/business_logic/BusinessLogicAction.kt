@@ -1,18 +1,18 @@
 package my.company.app.business_logic
 
 import my.company.app.lib.AuthorizationService
-import my.company.app.lib.inject
+import my.company.app.lib.TransactionContext
+import my.company.app.lib.lazy
 import my.company.app.lib.logger
 import my.company.app.lib.repository.Repositories
-import my.company.app.lib.TransactionContext
 import my.company.app.lib.validation.ValidationService
 import kotlin.coroutines.coroutineContext
 
 abstract class BusinessLogicAction<REQUEST : Any, RESPONSE> {
     protected val logger = this::class.logger()
-    protected val repo: Repositories by inject()
-    protected val validator: ValidationService by inject()
-    protected val authorizationService: AuthorizationService by inject()
+    protected val repo: Repositories by lazy()
+    protected val validator: ValidationService by lazy()
+    protected val authorizationService: AuthorizationService by lazy()
 
     open suspend fun execute(request: REQUEST): RESPONSE {
         val start = System.currentTimeMillis()

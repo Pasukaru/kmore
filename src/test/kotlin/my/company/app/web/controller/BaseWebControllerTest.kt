@@ -35,11 +35,9 @@ import my.company.app.lib.validation.Password
 import my.company.app.lib.validation.ValidationService
 import my.company.app.mainModule
 import my.company.app.test.KotlinArgumentCaptor
+import my.company.app.test.declareMock
 import my.company.app.web.ErrorResponse
 import my.company.app.web.getPathFromLocation
-import org.koin.core.context.GlobalContext
-import org.koin.core.qualifier.Qualifier
-import org.koin.dsl.module
 import org.mockito.Mockito
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
@@ -112,23 +110,8 @@ abstract class BaseWebControllerTest(
         }
     }
 
-    suspend inline fun TestApplicationEngine.expectTransaction() {
+    suspend inline fun expectTransaction() {
         Mockito.verify(eager<TransactionService>(), times(1)).transaction<Any>(any())
-    }
-
-    inline fun <reified BEAN : Any> TestApplicationEngine.declareSpy(qualifier: Qualifier? = null): BEAN {
-        val bean = eager(BEAN::class, qualifier)
-        val spy = Mockito.spy(bean)!!
-        val koin = GlobalContext.get()
-        koin.modules(module { single(override = true, createdAtStart = true, qualifier = qualifier) { spy } })
-        return spy
-    }
-
-    inline fun <reified BEAN : Any> TestApplicationEngine.declareMock(qualifier: Qualifier? = null): BEAN {
-        val spy = Mockito.mock(BEAN::class.java)!!
-        val koin = GlobalContext.get()
-        koin.modules(module { single(override = true, createdAtStart = true, qualifier = qualifier) { spy } })
-        return spy
     }
 
     inline fun <reified RESPONSE_BODY> TestApplicationCall.jsonResponse(): RESPONSE_BODY = response.jsonResponse()

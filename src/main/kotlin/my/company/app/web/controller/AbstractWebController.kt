@@ -11,7 +11,7 @@ import io.ktor.util.pipeline.PipelineContext
 import kotlinx.coroutines.CoroutineScope
 import my.company.app.lib.TransactionService
 import my.company.app.lib.controller.AbstractController
-import my.company.app.lib.inject
+import my.company.app.lib.lazy
 import my.company.app.web.EndpointInformation
 import my.company.app.web.Get
 import my.company.app.web.Post
@@ -34,7 +34,7 @@ abstract class AbstractWebController(
     tag: Tag = Tag(name, description)
 ) : AbstractController(tag) {
 
-    protected val transactionService: TransactionService by inject()
+    protected val transactionService: TransactionService by lazy()
 
     companion object {
         const val WEB_CONTROLLER_PREFIX = "Web"

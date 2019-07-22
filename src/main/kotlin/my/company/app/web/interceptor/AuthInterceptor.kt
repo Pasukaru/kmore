@@ -13,7 +13,7 @@ import io.ktor.response.respond
 import io.ktor.util.pipeline.PipelineContext
 import my.company.app.conf.AppConfig
 import my.company.app.lib.TransactionService
-import my.company.app.lib.inject
+import my.company.app.lib.lazy
 import my.company.app.lib.logger
 import my.company.app.lib.tryOrNull
 import my.company.app.web.AuthenticatedUser
@@ -27,8 +27,8 @@ import java.util.UUID
 class AuthInterceptor : WebInterceptor() {
 
     private val logger = logger<AuthInterceptor>()
-    private val appConfig: AppConfig by inject()
-    private val transactionService: TransactionService by inject()
+    private val appConfig: AppConfig by lazy()
+    private val transactionService: TransactionService by lazy()
 
     override suspend fun PipelineContext<*, ApplicationCall>.intercept() {
         val pipeline = this

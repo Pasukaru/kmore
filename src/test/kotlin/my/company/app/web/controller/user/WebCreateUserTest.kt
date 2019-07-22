@@ -7,13 +7,18 @@ import my.company.app.business_logic.user.CreateUserAction
 import my.company.app.business_logic.user.CreateUserRequest
 import my.company.app.db.newUser
 import my.company.app.lib.validation.ValidationService
+import my.company.app.test.declareMock
+import my.company.app.test.declareSpy
 import my.company.app.web.controller.BaseWebControllerTest
-import org.junit.Test
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.parallel.Execution
+import org.junit.jupiter.api.parallel.ExecutionMode
 import org.mockito.Mockito
 
 class WebCreateUserTest : BaseWebControllerTest(WebCreateUserLocation::class) {
 
     @Test
+    @Execution(ExecutionMode.CONCURRENT)
     fun requestIsValidated() {
         expectEmailValidation(WebCreateUserRequest::email)
         expectNotBlankValidation(WebCreateUserRequest::firstName)

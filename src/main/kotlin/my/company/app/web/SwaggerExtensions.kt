@@ -3,7 +3,7 @@ package my.company.app.web
 import com.google.common.base.Optional
 import com.google.common.collect.ArrayListMultimap
 import io.ktor.http.HttpStatusCode
-import my.company.app.lib.inject
+import my.company.app.lib.lazy
 import my.company.app.lib.swagger.OperationContext
 import my.company.app.lib.swagger.SwaggerConfiguration
 import org.springframework.http.HttpMethod
@@ -23,7 +23,7 @@ abstract class AbstractOperationBuilder<SELF : AbstractOperationBuilder<SELF>> :
     protected val self: SELF
         get() = this as SELF
 
-    protected val swagger: SwaggerConfiguration by inject()
+    protected val swagger: SwaggerConfiguration by lazy()
 
     protected lateinit var name: String
     protected lateinit var path: String
