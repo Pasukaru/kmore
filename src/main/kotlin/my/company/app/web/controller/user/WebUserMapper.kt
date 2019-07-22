@@ -14,7 +14,7 @@ class WebUserMapper {
 
     fun res(response: UserRecord) = WebCreateUserResponse(
         id = response.id,
-        email = response.lastName,
+        email = response.email,
         firstName = response.firstName,
         lastName = response.lastName
     )
@@ -22,7 +22,7 @@ class WebUserMapper {
     fun res(response: List<UserRecord>) = response.map { user ->
         WebGetUsersResponse(
             id = user.id,
-            email = user.lastName,
+            email = user.email,
             firstName = user.firstName,
             lastName = user.lastName
         )

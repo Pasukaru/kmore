@@ -37,9 +37,9 @@ inline fun <reified T : Any> inject(qualifier: Qualifier? = null): Lazy<T> {
     return lazy { GlobalContext.get().koin.get<T>(T::class, qualifier, null) }
 }
 
-inline fun <reified T : Any> eager(qualifier: Qualifier? = null): T {
-    return GlobalContext.get().koin.get(T::class, qualifier, null)
-}
+inline fun <reified T : Any> eager(qualifier: Qualifier? = null): T = eager(T::class, qualifier)
+
+fun <T : Any> eager(type: KClass<T>, qualifier: Qualifier? = null): T = GlobalContext.get().koin.get(type, qualifier, null)
 
 fun <T : Any> Scope.createInstance(
     clazz: KClass<T>

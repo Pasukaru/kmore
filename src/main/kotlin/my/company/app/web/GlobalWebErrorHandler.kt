@@ -8,8 +8,8 @@ import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
 import io.ktor.response.respond
 import io.ktor.util.pipeline.PipelineContext
-import my.company.app.lib.InvalidLoginCredentialsException
 import my.company.app.lib.InsufficientPermissionsException
+import my.company.app.lib.InvalidLoginCredentialsException
 import my.company.app.lib.UserByEmailAlreadyExistsException
 import my.company.app.lib.logger
 import my.company.app.lib.validation.ValidationException
@@ -23,6 +23,10 @@ class GlobalWebErrorHandler {
         STACK_TRACE,
         MESSAGE_ONLY,
         NOTHING
+    }
+
+    companion object {
+        private val VALIDATION_FAILED_MESSAGE = ValidationException(emptySet()).message!!
     }
 
     // <editor-fold="Handler Methods">
@@ -39,7 +43,11 @@ class GlobalWebErrorHandler {
 
     suspend fun PipelineContext<Unit, ApplicationCall>.badRequest(e: Throwable, logType: LogType = LogType.STACK_TRACE) {
         log(e, logType)
-        call.respond(HttpStatusCode.BadRequest, buildResponse(e))
+        val message = when (e) {
+            is MissingKotlinParameterException -> VALIDATION_FAILED_MESSAGE
+            else -> defaultMessage(e)
+        }
+        call.respond(HttpStatusCode.BadRequest, buildResponse(e, message = message))
     }
 
     suspend fun PipelineContext<Unit, ApplicationCall>.unauthorized(e: Throwable, logType: LogType = LogType.STACK_TRACE) {
@@ -87,13 +95,20 @@ class GlobalWebErrorHandler {
 
     private fun buildResponse(
         error: Throwable,
-        message: String = error.message ?: error.javaClass.simpleName,
+        message: String = defaultMessage(error),
         validationErrors: List<ValidationError> = getValidationErrors(error)
     ): ErrorResponse {
         return ErrorResponse(
             errorMessage = message,
             validationErrors = validationErrors
         )
+    }
+
+    private fun defaultMessage(e: Throwable): String {
+        return when (e) {
+            is MissingKotlinParameterException, is JsonMappingException -> VALIDATION_FAILED_MESSAGE
+            else -> e.message ?: e.javaClass.simpleName
+        }
     }
 
     private fun getValidationErrors(e: Throwable): List<ValidationError> {

@@ -26,6 +26,8 @@ fun PipelineContext<Unit, ApplicationCall>.getEndpointInformation(): EndpointInf
     return context.attributes[EndpointInformation.key]
 }
 
+inline fun <reified LOCATION> getPathFromLocation() = getPathFromLocation(LOCATION::class)
+
 @Suppress("EXPERIMENTAL_API_USAGE")
 fun getPathFromLocation(locationType: KClass<*>): String {
     val locationAnnotation = locationType.findAnnotation<Location>() ?: throw IllegalStateException("Location not found for: $locationType")

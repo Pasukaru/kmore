@@ -2,18 +2,22 @@
 
 package my.company.app
 
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.SerializationFeature
 import io.ktor.application.Application
 import io.ktor.application.install
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.DataConversion
 import io.ktor.features.StatusPages
+import io.ktor.jackson.jackson
 import io.ktor.locations.Locations
 import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import my.company.app.business_logic.session.SessionActions
 import my.company.app.business_logic.user.UserActions
+import my.company.app.conf.AppConfig
 import my.company.app.conf.AppConfigLoader
 import my.company.app.db.jooq.HikariCPFeature
 import my.company.app.lib.AuthorizationService
@@ -28,8 +32,7 @@ import my.company.app.lib.swagger.SwaggerConfiguration
 import my.company.app.lib.validation.ValidationService
 import my.company.app.web.GlobalWebErrorHandler
 import my.company.app.web.WebRouting
-import my.company.app.web.jacksonWeb
-import my.company.app.web.swagger
+import org.koin.core.context.GlobalContext
 import org.koin.dsl.module
 import org.koin.ktor.ext.Koin
 import org.reflections.Reflections
@@ -42,7 +45,7 @@ import java.util.TimeZone
 import java.util.concurrent.TimeUnit
 import javax.validation.Validation
 
-private val appConfig = AppConfigLoader.load()
+private lateinit var appConfig: AppConfig
 
 class KtorMain {
 
@@ -61,6 +64,7 @@ class KtorMain {
     }
 
     fun main() {
+        initConfig(System.getenv("PROFILE"))
         embeddedServer(
             Netty,
             port = appConfig.ktorPort,
@@ -76,6 +80,10 @@ class KtorMain {
         Thread.currentThread().join()
         return this
     }
+}
+
+fun initConfig(profile: String? = null) {
+    appConfig = AppConfigLoader.loadProfile(profile)
 }
 
 fun Application.mainModule() {
@@ -123,8 +131,13 @@ fun Application.mainModule() {
     }
 
     install(ContentNegotiation) {
-        jacksonWeb()
-        swagger()
+        jackson {
+            configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
+            configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+            configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+            configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false) // Instead of throwing an exception, ignore additional json properties that don't exist in our DTOs
+            GlobalContext.get().modules(module { single(createdAtStart = true) { this@jackson } })
+        }
     }
 
     install(HikariCPFeature)

@@ -79,6 +79,12 @@ dependencies {
     compile group: 'org.jooq', name: 'jooq', version: jooqVersion
     compile group: 'javax.annotation', name: 'javax.annotation-api', version: '1.2'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.9'
+
+    testCompile group: 'io.ktor', name: 'ktor-server-test-host', version: ktorVersion
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.0.0'
+    testCompile group: 'org.mockito', name: 'mockito-inline', version: '3.0.0'
+    testCompile group: 'com.willowtreeapps.assertk', name: 'assertk-jvm', version: '0.19'
+    testCompile "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0"
 }
 
 sourceSets {

@@ -27,7 +27,7 @@ class WebUserController : AbstractWebController(
         }
         documentedGet<WebGetUsersLocation>({ resList<WebGetUsersResponse>() }) {
             val res = mapper.res(noTransaction { userActions.getUsers.execute(Unit) })
-            call.respond(HttpStatusCode.Created, res)
+            call.respond(HttpStatusCode.OK, res)
         }
     }
 }

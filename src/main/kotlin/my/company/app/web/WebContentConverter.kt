@@ -37,17 +37,23 @@ fun ApplicationCall.isWebRequest(): Boolean {
     return request.local.uri.startsWith(WebLocation.PATH)
 }
 
+fun PipelineContext<*, ApplicationCall>.isSwaggerRequest(): Boolean {
+    val uri = call.request.local.uri
+    return uri.startsWith("/swagger")
+}
+
 fun ContentNegotiation.Configuration.jacksonWeb(
     contentType: ContentType = ContentType.Application.Json
-) {
+): ObjectMapper {
     val mapper = jacksonObjectMapper()
     mapper.apply {
         setDefaultPrettyPrinter(DefaultPrettyPrinter().apply {
             indentArraysWith(DefaultPrettyPrinter.FixedSpaceIndenter.instance)
             indentObjectsWith(DefaultIndenter("  ", "\n"))
         })
-        configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false) // Instead of throwing an exception, ignore additional json properties that don't exist in our DTOs
+
     }
     val converter = WebContentConverter(mapper)
     register(contentType, converter)
+    return mapper
 }

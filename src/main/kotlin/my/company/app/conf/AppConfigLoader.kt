@@ -14,27 +14,26 @@ object AppConfigLoader {
     private val SYSTEM_CLASS_LOADER = ClassLoader.getSystemClassLoader()
     private val FILE_CLASS_LOADER = FileClassLoader()
 
-    fun load(): AppConfig {
-        val applicationConfig = load("application.conf")
-        val includeProfile = System.getenv("PROFILE")?.takeIf { it.isNotBlank() }
-        val mergedConfig = includeProfile?.let { applicationConfig.includeProfile(it) } ?: applicationConfig
+    fun loadProfile(profile: String? = null): AppConfig {
+        val applicationConfig = loadFile("application.conf")
+        val mergedConfig = profile?.let { applicationConfig.includeProfile(it) } ?: applicationConfig
         return AppConfig(mergedConfig)
     }
 
-    private fun load(name: String): Config {
+    private fun loadFile(name: String): Config {
         if (FILE_CLASS_LOADER.exists(name)) return ConfigFactory.load(FILE_CLASS_LOADER, name)
         return ConfigFactory.load(SYSTEM_CLASS_LOADER, name)
     }
 
     private fun Config.includeProfile(name: String): Config {
-        load("application-$name.conf")
-        val config = withFallback(load("application-$name.conf"))
+        loadFile("application-$name.conf")
+        val config = withFallback(loadFile("application-$name.conf"))
         return config.loadIncludes()
     }
 
     private fun Config.loadIncludes(): Config {
         val fallbackProfile = tryGetString("profile.include") ?: return this
-        val fallbackConfig = load("application-$fallbackProfile.conf")
+        val fallbackConfig = loadFile("application-$fallbackProfile.conf")
         return withFallback(fallbackConfig.loadIncludes())
     }
 
