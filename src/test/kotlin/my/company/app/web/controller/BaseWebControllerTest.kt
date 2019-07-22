@@ -5,11 +5,16 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isNotNull
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.times
 import io.ktor.application.Application
+import io.ktor.application.ApplicationCallPipeline
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
+import io.ktor.routing.Routing
+import io.ktor.routing.routing
 import io.ktor.server.testing.TestApplicationCall
 import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.TestApplicationRequest
@@ -17,8 +22,12 @@ import io.ktor.server.testing.TestApplicationResponse
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.setBody
 import io.ktor.server.testing.withTestApplication
+import io.ktor.util.pipeline.Pipeline
+import io.ktor.util.pipeline.PipelinePhase
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import my.company.app.initConfig
+import my.company.app.lib.TransactionService
 import my.company.app.lib.eager
 import my.company.app.lib.validation.Email
 import my.company.app.lib.validation.NotBlank
@@ -61,13 +70,50 @@ abstract class BaseWebControllerTest(
         }
     }
 
-    open fun controllerTest(profile: String = "test", testFn: suspend TestApplicationEngine.() -> Unit) {
+    protected open fun Routing.skipInterceptors() {
+        // TODO: Find a nicer way than this ugly reflection magic to skip interceptors
+        val findPhase = Pipeline::class.java.getDeclaredMethod("findPhase", PipelinePhase::class.java).also { it.isAccessible = true }
+        val phase = findPhase(this, ApplicationCallPipeline.Call)
+        if (phase != null) {
+            val interceptors = phase::class.java.getDeclaredField("interceptors").also { it.isAccessible = true }.get(phase) as ArrayList<*>
+            interceptors.clear()
+        }
+    }
+
+    protected open suspend fun TestApplicationEngine.mockTransactions() {
+        val transactionService = declareMock<TransactionService>()
+        Mockito.doAnswer {
+            runBlocking {
+                @Suppress("UNCHECKED_CAST") val fn = it.arguments.first() as suspend CoroutineScope.() -> Any?
+                fn(this)
+            }
+        }.`when`(transactionService).noTransaction<Any>(any())
+        Mockito.doAnswer {
+            runBlocking {
+                @Suppress("UNCHECKED_CAST") val fn = it.arguments.first() as suspend CoroutineScope.() -> Any?
+                fn(this)
+            }
+        }.`when`(transactionService).transaction<Any>(any())
+    }
+
+    protected fun controllerTest(
+        profile: String = "test",
+        testFn: suspend TestApplicationEngine.() -> Unit
+    ) {
         initConfig(profile)
         withTestApplication(Application::mainModule) {
             runBlocking {
+                application.routing {
+                    skipInterceptors()
+                }
+                mockTransactions()
                 testFn()
             }
         }
+    }
+
+    suspend inline fun TestApplicationEngine.expectTransaction() {
+        Mockito.verify(eager<TransactionService>(), times(1)).transaction<Any>(any())
     }
 
     inline fun <reified BEAN : Any> TestApplicationEngine.declareSpy(qualifier: Qualifier? = null): BEAN {

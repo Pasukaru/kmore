@@ -8,7 +8,10 @@ import io.ktor.locations.get
 import io.ktor.locations.post
 import io.ktor.routing.Routing
 import io.ktor.util.pipeline.PipelineContext
+import kotlinx.coroutines.CoroutineScope
+import my.company.app.lib.TransactionService
 import my.company.app.lib.controller.AbstractController
+import my.company.app.lib.inject
 import my.company.app.web.EndpointInformation
 import my.company.app.web.Get
 import my.company.app.web.Post
@@ -30,6 +33,9 @@ abstract class AbstractWebController(
     val description: String = "Everything about ${name.removePrefix("Web").removeSuffix("Controller")}",
     tag: Tag = Tag(name, description)
 ) : AbstractController(tag) {
+
+    protected val transactionService: TransactionService by inject()
+
     companion object {
         const val WEB_CONTROLLER_PREFIX = "Web"
     }
@@ -70,4 +76,7 @@ abstract class AbstractWebController(
             withAuthContext { this@get.getOp() }
         }
     }
+
+    protected suspend inline fun <reified T> transaction(crossinline block: suspend CoroutineScope.() -> T): T = transactionService.transaction { block() }
+    protected suspend inline fun <reified T> noTransaction(crossinline block: suspend CoroutineScope.() -> T): T = transactionService.noTransaction { block() }
 }

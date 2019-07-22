@@ -5,7 +5,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.request.receive
 import io.ktor.response.respond
 import io.ktor.routing.Routing
-import my.company.app.lib.transaction
 import my.company.app.web.controller.AbstractWebController
 import my.company.app.web.controller.WebLocation
 

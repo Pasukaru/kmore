@@ -43,6 +43,7 @@ class WebCreateUserTest : BaseWebControllerTest(WebCreateUserLocation::class) {
         Mockito.doReturn(mockedResponse).`when`(actionMock).execute(actionRequest.capture())
 
         jsonPost(request) {
+            expectTransaction()
             expectJsonResponse(HttpStatusCode.Created, WebCreateUserResponse(
                 id = mockedResponse.id,
                 email = mockedResponse.email,
@@ -56,7 +57,6 @@ class WebCreateUserTest : BaseWebControllerTest(WebCreateUserLocation::class) {
                 passwordClean = request.password
             ))
         }
-
         validator.hasValidated(request)
     }
 }

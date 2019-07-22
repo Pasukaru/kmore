@@ -4,12 +4,12 @@ import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.pool.HikariPool
 import io.ktor.application.Application
 import io.ktor.application.ApplicationFeature
-import io.ktor.application.ApplicationStopping
 import io.ktor.util.AttributeKey
 import my.company.app.lib.logger
 import org.koin.core.KoinApplication
 import org.koin.core.context.GlobalContext
 import org.koin.dsl.module
+import org.koin.dsl.onClose
 
 class HikariCPFeature {
 
@@ -42,12 +42,12 @@ class HikariCPFeature {
                     val pool = HikariPool(config)
                     feature.pool = pool
 
-                    pipeline.environment.monitor.subscribe(ApplicationStopping) {
-                        logger.debug("Shutting down Hikari connection pool")
-                        pool.shutdown()
-                    }
-
                     pool
+                }.onClose {
+                    it?.let {
+                        logger.debug("Shutting down Hikari connection pool")
+                        it.shutdown()
+                    }
                 }
             })
 

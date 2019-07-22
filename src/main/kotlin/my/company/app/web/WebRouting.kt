@@ -54,8 +54,8 @@ object WebRouting : ApplicationFeature<Application, Unit, Unit> {
             val koin = pipeline.getKoin()
 
             pipeline.routing {
-                CorsInterceptor.register(this, ApplicationCallPipeline.Call)
-                AuthInterceptor.register(this, ApplicationCallPipeline.Call)
+                CorsInterceptor().register(this, ApplicationCallPipeline.Call)
+                AuthInterceptor().register(this, ApplicationCallPipeline.Call)
                 initControllers(koin)
                 koin.instantiate(SwaggerController::class).routing(this)
             }

@@ -12,9 +12,9 @@ import io.ktor.response.header
 import io.ktor.response.respond
 import io.ktor.util.pipeline.PipelineContext
 import my.company.app.conf.AppConfig
+import my.company.app.lib.TransactionService
 import my.company.app.lib.inject
 import my.company.app.lib.logger
-import my.company.app.lib.noTransaction
 import my.company.app.lib.tryOrNull
 import my.company.app.web.AuthenticatedUser
 import my.company.app.web.SessionKey
@@ -24,11 +24,11 @@ import my.company.app.web.isWebRequest
 import java.util.UUID
 
 @Suppress("EXPERIMENTAL_API_USAGE")
-object AuthInterceptor : WebInterceptor() {
+class AuthInterceptor : WebInterceptor() {
 
     private val logger = logger<AuthInterceptor>()
-
     private val appConfig: AppConfig by inject()
+    private val transactionService: TransactionService by inject()
 
     override suspend fun PipelineContext<*, ApplicationCall>.intercept() {
         val pipeline = this
@@ -45,7 +45,7 @@ object AuthInterceptor : WebInterceptor() {
 
         if (!isWebRequest()) return
 
-        noTransaction {
+        transactionService.noTransaction {
             val token = call.request.header("X-Auth-Token")?.tryOrNull { UUID.fromString(it) }
             if (token != null) {
                 val session = repositories.session.findById(token)

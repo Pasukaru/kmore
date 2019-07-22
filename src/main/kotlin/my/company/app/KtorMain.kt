@@ -22,6 +22,7 @@ import my.company.app.conf.AppConfigLoader
 import my.company.app.db.jooq.HikariCPFeature
 import my.company.app.lib.AuthorizationService
 import my.company.app.lib.PasswordHelper
+import my.company.app.lib.TransactionService
 import my.company.app.lib.eager
 import my.company.app.lib.ktor.ApplicationWarmup
 import my.company.app.lib.ktor.StartupLog
@@ -118,6 +119,7 @@ fun Application.mainModule() {
                     single { validationFactory }
                     single { validationFactory.validator }
                     single { ValidationService() }
+                    single { TransactionService() }
                 },
                 Repositories.MODULE,
                 SessionActions.MODULE,
