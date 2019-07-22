@@ -82,8 +82,9 @@ class KtorMain {
     }
 }
 
-fun initConfig(profile: String? = null) {
+fun initConfig(profile: String? = null): AppConfig {
     appConfig = AppConfigLoader.loadProfile(profile)
+    return appConfig
 }
 
 fun Application.mainModule() {

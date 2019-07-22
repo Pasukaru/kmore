@@ -1,7 +1,7 @@
 package my.company.app.lib.repository
 
-import my.company.app.lib.logger
 import my.company.app.lib.TransactionContext
+import my.company.app.lib.logger
 import org.jooq.DSLContext
 import org.jooq.Field
 import org.jooq.Query
@@ -35,7 +35,7 @@ abstract class AbstractRepository<ID, TABLE : Table<RECORD>, RECORD : Record>(
 
     open suspend fun findAll(): List<RECORD> = db { connectionDsl().select().from(table).fetch().into(table) }
 
-    open suspend fun insert(record: RECORD, dialect: SQLDialect = this.dialect): RECORD {
+    open suspend fun insert(record: RECORD): RECORD {
         val q = dsl.insertInto(table).set(record)
         val rows = execute(q)
         if (rows != 1) throw SQLDataException("Failed to insert row")
@@ -45,7 +45,7 @@ abstract class AbstractRepository<ID, TABLE : Table<RECORD>, RECORD : Record>(
     @Suppress("UNCHECKED_CAST")
     protected open val RECORD.id : ID get() = this["id"] as ID
 
-    open suspend fun update(record: RECORD, dialect: SQLDialect = this.dialect): RECORD {
+    open suspend fun update(record: RECORD): RECORD {
         val q = dsl.update(table).set(record).where(primaryKey.eq(record.id))
         val rows = execute(q)
         if (rows != 1) throw SQLDataException("Failed to update row")
