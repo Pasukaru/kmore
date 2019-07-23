@@ -1,5 +1,6 @@
 package my.company.app.business_logic
 
+import my.company.app.db.ModelGenerator
 import my.company.app.lib.AuthorizationService
 import my.company.app.lib.TransactionContext
 import my.company.app.lib.lazy
@@ -12,12 +13,14 @@ abstract class BusinessLogicAction<REQUEST : Any, RESPONSE> {
     protected val logger = this::class.logger()
     protected val repo: Repositories by lazy()
     protected val validator: ValidationService by lazy()
+    protected val generate: ModelGenerator by lazy()
     protected val authorizationService: AuthorizationService by lazy()
 
     open suspend fun execute(request: REQUEST): RESPONSE {
         val start = System.currentTimeMillis()
 
-        val response = action(validate(request))
+        val validatedRequest = validate(request)
+        val response = action(validatedRequest)
 
         val time = System.currentTimeMillis() - start
         logger.debug("${this::class.simpleName} completed in ${time}ms")

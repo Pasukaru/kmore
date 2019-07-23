@@ -1,7 +1,6 @@
 package my.company.app.business_logic.session
 
 import my.company.app.business_logic.BusinessLogicAction
-import my.company.app.db.newSession
 import my.company.app.lib.InvalidLoginCredentialsException
 import my.company.app.lib.PasswordHelper
 import my.company.app.lib.lazy
@@ -16,10 +15,8 @@ class LoginAction : BusinessLogicAction<LoginRequest, SessionRecord>() {
         val user = repo.user.findByEmailIgnoringCase(request.email) ?: throw InvalidLoginCredentialsException()
         if (!passwordHelper.checkPassword(request.passwordClean, user.password)) throw InvalidLoginCredentialsException()
 
-        return repo.session.insert(
-            newSession(
-                userId = user.id
-            )
-        )
+        return repo.session.insert(generate.session(
+            userId = user.id
+        ))
     }
 }

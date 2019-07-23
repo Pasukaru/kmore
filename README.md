@@ -28,4 +28,4 @@ http://localhost:8080/swagger/index.html?url=swagger.json
 
 * Fixtures (To be loaded when the `load-fixtures` profile is active)
 * Database hooks? (automated `created_at`, `updated_at`, etc?)
-* Testing (Unit, Integration)
+* Testing (Integration)

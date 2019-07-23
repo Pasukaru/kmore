@@ -2,13 +2,14 @@ package my.company.app.web.controller.user
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import com.nhaarman.mockitokotlin2.capture
 import io.ktor.http.HttpStatusCode
 import my.company.app.business_logic.user.CreateUserAction
 import my.company.app.business_logic.user.CreateUserRequest
-import my.company.app.db.newUser
-import my.company.app.lib.validation.ValidationService
+import my.company.app.lib.Faker
+import my.company.app.test.captor
 import my.company.app.test.declareMock
-import my.company.app.test.declareSpy
+import my.company.app.test.singleValue
 import my.company.app.web.controller.BaseWebControllerTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.parallel.Execution
@@ -29,33 +30,26 @@ class WebCreateUserTest : BaseWebControllerTest(WebCreateUserLocation::class) {
     @Test
     fun returnsCorrectResult() = controllerTest {
         val actionMock = declareMock<CreateUserAction>()
-        val validator = declareSpy<ValidationService>()
+        val validator = mockValidator()
 
         val request = WebCreateUserRequest(
-            email = "email@derp.com",
-            firstName = "firstName",
-            lastName = "lastName",
-            password = "passwordAD12345!!!"
+            email = Faker.internet().emailAddress(),
+            firstName = Faker.name().firstName(),
+            lastName = Faker.name().lastName(),
+            password = Faker.internet().password()
         )
         val actionRequest = captor<CreateUserRequest>()
-        val mockedResponse = newUser(
-            email = "random@email.com",
-            firstName = "blubb",
-            lastName = "bla",
-            password = "123"
-
-        )
-        Mockito.doReturn(mockedResponse).`when`(actionMock).execute(actionRequest.capture())
+        val mockedResponse = fixtures.user()
+        Mockito.doReturn(mockedResponse).`when`(actionMock).execute(capture(actionRequest))
 
         jsonPost(request) {
-            expectTransaction()
             expectJsonResponse(HttpStatusCode.Created, WebCreateUserResponse(
                 id = mockedResponse.id,
                 email = mockedResponse.email,
                 firstName = mockedResponse.firstName,
                 lastName = mockedResponse.lastName
             ))
-            assertThat(actionRequest.value).isEqualTo(CreateUserRequest(
+            assertThat(actionRequest.singleValue).isEqualTo(CreateUserRequest(
                 email = request.email,
                 firstName = request.firstName,
                 lastName = request.lastName,

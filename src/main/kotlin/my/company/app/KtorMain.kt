@@ -19,9 +19,12 @@ import my.company.app.business_logic.session.SessionActions
 import my.company.app.business_logic.user.UserActions
 import my.company.app.conf.AppConfig
 import my.company.app.conf.AppConfigLoader
+import my.company.app.db.ModelGenerator
 import my.company.app.db.jooq.HikariCPFeature
 import my.company.app.lib.AuthorizationService
+import my.company.app.lib.IdGenerator
 import my.company.app.lib.PasswordHelper
+import my.company.app.lib.TimeService
 import my.company.app.lib.TransactionService
 import my.company.app.lib.containerModule
 import my.company.app.lib.eager
@@ -112,6 +115,9 @@ fun Application.mainModule() {
                         SwaggerConfiguration()
                             .registerOperationParameterInterceptor { authHeader }
                     }
+                    single { IdGenerator() }
+                    single { TimeService() }
+                    single { ModelGenerator() }
                     single { AuthorizationService() }
                     single { GlobalWebErrorHandler() }
                     single { PasswordHelper() }

@@ -3,13 +3,16 @@ package my.company.app.web.controller.session
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.capture
 import io.ktor.http.HttpStatusCode
 import my.company.app.business_logic.session.LoginAction
 import my.company.app.business_logic.session.LoginRequest
 import my.company.app.lib.InvalidLoginCredentialsException
 import my.company.app.lib.validation.ValidationService
+import my.company.app.test.captor
 import my.company.app.test.declareMock
 import my.company.app.test.declareSpy
+import my.company.app.test.singleValue
 import my.company.app.web.GlobalWebErrorHandler
 import my.company.app.web.controller.BaseWebControllerTest
 import my.company.jooq.tables.records.SessionRecord
@@ -28,11 +31,11 @@ class WebLoginTest : BaseWebControllerTest(WebLoginLocation::class) {
         val request = WebLoginRequest(email = "email", password = "password")
         val actionRequest = captor<LoginRequest>()
         val mockedResponse = SessionRecord().also { it.id = UUID.randomUUID() }
-        Mockito.doReturn(mockedResponse).`when`(actionMock).execute(actionRequest.capture())
+        Mockito.doReturn(mockedResponse).`when`(actionMock).execute(capture(actionRequest))
 
         jsonPost(request) {
             expectJsonResponse(HttpStatusCode.Created, WebLoginResponse(id = mockedResponse.id))
-            assertThat(actionRequest.value).isEqualTo(LoginRequest(email = request.email, passwordClean = request.password))
+            assertThat(actionRequest.singleValue).isEqualTo(LoginRequest(email = request.email, passwordClean = request.password))
         }
 
         validator.hasValidated(request)

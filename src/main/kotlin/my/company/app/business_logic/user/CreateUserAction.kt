@@ -1,7 +1,6 @@
 package my.company.app.business_logic.user
 
 import my.company.app.business_logic.BusinessLogicAction
-import my.company.app.db.newUser
 import my.company.app.lib.PasswordHelper
 import my.company.app.lib.UserByEmailAlreadyExistsException
 import my.company.app.lib.lazy
@@ -30,7 +29,7 @@ class CreateUserAction : BusinessLogicAction<CreateUserRequest, UserRecord>() {
     override suspend fun action(request: CreateUserRequest): UserRecord {
         if (repo.user.existsByEmailIgnoringCase(request.email)) throw UserByEmailAlreadyExistsException()
 
-        return repo.user.insert(newUser(
+        return repo.user.insert(generate.user(
             email = request.email,
             firstName = request.firstName,
             lastName = request.lastName,

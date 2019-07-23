@@ -34,7 +34,7 @@ import my.company.app.lib.validation.NotBlank
 import my.company.app.lib.validation.Password
 import my.company.app.lib.validation.ValidationService
 import my.company.app.mainModule
-import my.company.app.test.KotlinArgumentCaptor
+import my.company.app.test.Fixtures
 import my.company.app.test.declareMock
 import my.company.app.web.ErrorResponse
 import my.company.app.web.getPathFromLocation
@@ -47,6 +47,8 @@ abstract class BaseWebControllerTest(
     protected val location: KClass<*>,
     protected val url: String = getPathFromLocation(location)
 ) {
+
+    protected val fixtures = Fixtures
 
     protected inline fun TestApplicationEngine.jsonPost(body: Any, crossinline setup: TestApplicationRequest.() -> Unit = {}, testFn: TestApplicationCall.() -> Unit = {}) {
         with(handleRequest(HttpMethod.Post, url) {
@@ -94,6 +96,12 @@ abstract class BaseWebControllerTest(
         }.`when`(transactionService).transaction<Any>(any())
     }
 
+    protected fun mockValidator(): ValidationService {
+        val validator = declareMock<ValidationService>()
+        Mockito.doAnswer { it.arguments.first() }.`when`(validator).validate<Any>(any())
+        return validator
+    }
+
     protected fun controllerTest(
         profile: String = "test",
         testFn: suspend TestApplicationEngine.() -> Unit
@@ -130,8 +138,6 @@ abstract class BaseWebControllerTest(
         val type = om.typeFactory.constructCollectionLikeType(ArrayList::class.java, RESPONSE_BODY::class.java)
         return om.readValue(content, type)
     }
-
-    inline fun <reified TYPE : Any> captor(): KotlinArgumentCaptor<TYPE> = KotlinArgumentCaptor.forClass()
 
     fun TestApplicationResponse.expectError(status: HttpStatusCode, error: Throwable) {
         assertThat(this.status()).isEqualTo(status)
