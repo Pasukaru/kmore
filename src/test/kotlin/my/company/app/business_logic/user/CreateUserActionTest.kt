@@ -15,11 +15,15 @@ import my.company.app.lib.UserByEmailAlreadyExistsException
 import my.company.app.test.captor
 import my.company.app.test.declareMock
 import my.company.app.test.expectAllChanged
+import my.company.app.test.expectEmailValidation
 import my.company.app.test.expectException
+import my.company.app.test.expectNotBlankValidation
+import my.company.app.test.expectPasswordValidation
 import my.company.app.test.singleValue
 import my.company.jooq.tables.records.UserRecord
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.parallel.Execution
+import org.junit.jupiter.api.parallel.ExecutionMode
 import org.mockito.ArgumentCaptor
 import org.mockito.Mockito
 import java.time.Instant
@@ -29,7 +33,6 @@ class CreateUserActionTest : AbstractActionTest() {
 
     private lateinit var passwordHelper: PasswordHelper
 
-    @BeforeEach
     override fun beforeEach() {
         super.beforeEach()
         passwordHelper = declareMock()
@@ -62,6 +65,15 @@ class CreateUserActionTest : AbstractActionTest() {
             hashedPassword = hashedPassword,
             createdUser = createdUser
         )
+    }
+
+    @Test
+    @Execution(ExecutionMode.CONCURRENT)
+    fun requestIsValidated() {
+        expectEmailValidation(CreateUserRequest::email)
+        expectNotBlankValidation(CreateUserRequest::firstName)
+        expectNotBlankValidation(CreateUserRequest::lastName)
+        expectPasswordValidation(CreateUserRequest::passwordClean)
     }
 
     @Test

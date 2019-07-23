@@ -1,5 +1,6 @@
 package my.company.app.web
 
+import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
@@ -9,10 +10,11 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.response.respond
 import io.ktor.util.pipeline.PipelineContext
 import my.company.app.lib.InsufficientPermissionsException
+import my.company.app.lib.InvalidJsonException
 import my.company.app.lib.InvalidLoginCredentialsException
 import my.company.app.lib.UserByEmailAlreadyExistsException
+import my.company.app.lib.ValidationException
 import my.company.app.lib.logger
-import my.company.app.lib.validation.ValidationException
 import javax.validation.ConstraintViolation
 
 class GlobalWebErrorHandler {
@@ -27,6 +29,7 @@ class GlobalWebErrorHandler {
 
     companion object {
         private val VALIDATION_FAILED_MESSAGE = ValidationException(emptySet()).message!!
+        private val INVALID_JSON_MESSAGE = InvalidJsonException().message!!
     }
 
     // <editor-fold="Handler Methods">
@@ -45,6 +48,7 @@ class GlobalWebErrorHandler {
         log(e, logType)
         val message = when (e) {
             is MissingKotlinParameterException -> VALIDATION_FAILED_MESSAGE
+            is JsonParseException -> INVALID_JSON_MESSAGE
             else -> defaultMessage(e)
         }
         call.respond(HttpStatusCode.BadRequest, buildResponse(e, message = message))
@@ -74,6 +78,8 @@ class GlobalWebErrorHandler {
             is ValidationException -> badRequest(e, LogType.NOTHING)
             is MismatchedInputException -> badRequest(e, LogType.NOTHING)
             is MissingKotlinParameterException -> badRequest(e, LogType.NOTHING)
+            is JsonParseException -> badRequest(e, LogType.NOTHING)
+            is InvalidJsonException -> badRequest(e, LogType.NOTHING)
             is InvalidLoginCredentialsException -> unauthorized(e, LogType.NOTHING)
             is UserByEmailAlreadyExistsException -> preconditionFailed(e, LogType.NOTHING)
             is InsufficientPermissionsException -> forbidden(e, LogType.NOTHING)

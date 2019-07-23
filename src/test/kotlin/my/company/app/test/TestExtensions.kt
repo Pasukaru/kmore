@@ -4,10 +4,14 @@ import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
+import assertk.assertions.isNotNull
 import assertk.assertions.isTrue
 import io.ktor.http.HttpStatusCode
 import my.company.app.lib.eager
 import my.company.app.lib.singleInstance
+import my.company.app.lib.validation.Email
+import my.company.app.lib.validation.NotBlank
+import my.company.app.lib.validation.Password
 import org.jooq.Record
 import org.koin.core.context.GlobalContext
 import org.koin.core.definition.BeanDefinition
@@ -20,8 +24,10 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Mockito
 import org.opentest4j.AssertionFailedError
 import kotlin.reflect.KClass
+import kotlin.reflect.KProperty
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.isSubclassOf
+import kotlin.reflect.jvm.javaField
 
 fun HttpStatusCode?.expectCreated() = assertThat(this).isEqualTo(HttpStatusCode.Created)
 fun HttpStatusCode?.expectOK() = assertThat(this).isEqualTo(HttpStatusCode.OK)
@@ -94,4 +100,26 @@ fun Record.expectChanged(field: String) {
     // Null fields are not marked as changed on init
     val changed = this.changed(field) || this[field] == null
     assertThat(changed, "Expected $field to have been changed").isTrue()
+}
+
+fun expectNotNullProperty(property: KProperty<*>) {
+    assertThat(property.returnType.isMarkedNullable, "Property $property is not optional and should not be nullable").isFalse()
+}
+
+fun expectEmailValidation(property: KProperty<String>, optional: Boolean = false) {
+    val annotation = property.javaField?.getAnnotation(Email::class.java)
+    assertThat(annotation, "Expected @Password annotation on $property").isNotNull()
+    if (!optional) expectNotNullProperty(property)
+}
+
+fun expectNotBlankValidation(property: KProperty<String>, optional: Boolean = false) {
+    val annotation = property.javaField?.getAnnotation(NotBlank::class.java)
+    assertThat(annotation, "Expected @NotBlank annotation on $property").isNotNull()
+    if (!optional) expectNotNullProperty(property)
+}
+
+fun expectPasswordValidation(property: KProperty<String>, optional: Boolean = false) {
+    val annotation = property.javaField?.getAnnotation(Password::class.java)
+    assertThat(annotation, "Expected @Email annotation on $property").isNotNull()
+    if (!optional) expectNotNullProperty(property)
 }

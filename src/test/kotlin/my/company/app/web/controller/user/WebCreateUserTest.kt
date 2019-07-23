@@ -9,6 +9,9 @@ import my.company.app.business_logic.user.CreateUserRequest
 import my.company.app.lib.Faker
 import my.company.app.test.captor
 import my.company.app.test.declareMock
+import my.company.app.test.expectEmailValidation
+import my.company.app.test.expectNotBlankValidation
+import my.company.app.test.expectPasswordValidation
 import my.company.app.test.singleValue
 import my.company.app.web.controller.BaseWebControllerTest
 import org.junit.jupiter.api.Test

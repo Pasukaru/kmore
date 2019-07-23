@@ -13,8 +13,6 @@ import my.company.app.lib.repository.Repositories
 import my.company.app.lib.validation.ValidationService
 import my.company.app.test.Fixtures
 import my.company.app.test.mockedContainerModule
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
@@ -32,7 +30,6 @@ abstract class AbstractActionTest {
 
     protected val fixtures = Fixtures
 
-    @BeforeEach
     open fun beforeEach() {
         startKoin {
             modules(listOf(
@@ -54,10 +51,14 @@ abstract class AbstractActionTest {
     }
 
     fun actionTest(testFn: suspend () -> Unit) = runBlocking {
-        testFn()
+        beforeEach()
+        try {
+            testFn()
+        } finally {
+            afterEach()
+        }
     }
 
-    @AfterEach
     open fun afterEach() {
         stopKoin()
     }

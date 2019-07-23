@@ -1,9 +1,11 @@
 package my.company.app.lib
 
+import javax.validation.ConstraintViolation
+
 abstract class ServiceException(message: String, cause: Throwable? = null) : RuntimeException(message, cause)
 
-class InvalidLoginCredentialsException : ServiceException("{login.credentials.invalid}")
-
+class ValidationException(val violations: Set<ConstraintViolation<*>>) : ServiceException("{error.validation.failed}")
+class InvalidJsonException : ServiceException("{error.json.invalid}")
+class InvalidLoginCredentialsException : ServiceException("{error.credentials.invalid}")
 class InsufficientPermissionsException : ServiceException("{error.access.denied}")
-
 class UserByEmailAlreadyExistsException : ServiceException("{error.user.email.exists}")
