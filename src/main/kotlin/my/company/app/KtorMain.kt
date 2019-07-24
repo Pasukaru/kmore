@@ -136,8 +136,6 @@ fun Application.mainModule() {
         )
     }
 
-    val koin = getKoin()
-
     install(DataConversion) {
         uuidConverter()
     }
