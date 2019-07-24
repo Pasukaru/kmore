@@ -26,9 +26,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import my.company.app.initConfig
 import my.company.app.lib.TransactionService
+import my.company.app.lib.di.KoinCoroutineInterceptor
 import my.company.app.lib.eager
+import my.company.app.lib.ktor.getKoin
 import my.company.app.lib.validation.ValidationService
 import my.company.app.mainModule
+import my.company.app.test.AbstractTest
 import my.company.app.test.declareMock
 import my.company.app.test.fixtures.InMemoryFixtures
 import my.company.app.web.ErrorResponse
@@ -39,7 +42,7 @@ import kotlin.reflect.KClass
 abstract class BaseWebControllerTest(
     protected val location: KClass<*>,
     protected val url: String = getPathFromLocation(location)
-) {
+) : AbstractTest() {
 
     protected val fixtures = InMemoryFixtures
 
@@ -101,7 +104,8 @@ abstract class BaseWebControllerTest(
     ) {
         initConfig(profile)
         withTestApplication(Application::mainModule) {
-            runBlocking {
+            val koin = this.application.getKoin()
+            runBlocking(KoinCoroutineInterceptor(koin)) {
                 application.routing {
                     skipInterceptors()
                 }

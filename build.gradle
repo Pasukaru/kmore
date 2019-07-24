@@ -61,8 +61,8 @@ dependencies {
     compile group: 'io.ktor', name: 'ktor-websockets', version: ktorVersion
     implementation group: 'io.ktor', name: 'ktor-jackson', version: ktorVersion
     implementation group: 'io.ktor', name: 'ktor-locations', version: ktorVersion
+    compile group: 'org.koin', name: 'koin-core', version: koinVersion
 
-    compile group: 'org.koin', name: 'koin-ktor', version: koinVersion
     compile group: 'org.postgresql', name: 'postgresql', version: postgresDriverVersion
     compile group: 'org.flywaydb', name: 'flyway-core', version: flywayVersion
     compile group: 'com.zaxxer', name: 'HikariCP', version: '3.3.1'

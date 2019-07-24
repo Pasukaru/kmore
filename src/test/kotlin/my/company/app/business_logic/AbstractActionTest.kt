@@ -8,17 +8,19 @@ import my.company.app.initConfig
 import my.company.app.lib.AuthorizationService
 import my.company.app.lib.IdGenerator
 import my.company.app.lib.TimeService
+import my.company.app.lib.di.KoinContext
+import my.company.app.lib.di.KoinCoroutineInterceptor
 import my.company.app.lib.eager
 import my.company.app.lib.repository.Repositories
 import my.company.app.lib.validation.ValidationService
+import my.company.app.test.AbstractTest
 import my.company.app.test.fixtures.InMemoryFixtures
 import my.company.app.test.mockedContainerModule
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
+import org.koin.core.KoinApplication
 import org.koin.dsl.module
 import org.mockito.Mockito
 
-abstract class AbstractActionTest {
+abstract class AbstractActionTest : AbstractTest() {
 
     open val profile: String = "test"
 
@@ -30,8 +32,8 @@ abstract class AbstractActionTest {
 
     protected val fixtures = InMemoryFixtures
 
-    open fun beforeEach() {
-        startKoin {
+    open fun beforeEach(): KoinApplication {
+        val koin = KoinContext.startKoin {
             modules(listOf(
                 module { single { initConfig(profile) } },
                 module { single { IdGenerator() } },
@@ -48,18 +50,19 @@ abstract class AbstractActionTest {
         mockedAuthorizationService = eager()
         repo = eager()
         Mockito.doAnswer { it.arguments.first() }.`when`(validationService).validate<Any>(any())
+        return koin
     }
 
     fun actionTest(testFn: suspend () -> Unit) = runBlocking {
-        beforeEach()
+        val koin = beforeEach()
         try {
-            testFn()
+            with(KoinCoroutineInterceptor(koin)) { testFn() }
         } finally {
             afterEach()
         }
     }
 
     open fun afterEach() {
-        stopKoin()
+        KoinContext.stopKoin()
     }
 }

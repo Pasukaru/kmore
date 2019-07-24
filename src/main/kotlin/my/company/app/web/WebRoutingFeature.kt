@@ -10,13 +10,13 @@ import my.company.app.KtorMain
 import my.company.app.lib.controller.AbstractController
 import my.company.app.lib.controller.SwaggerController
 import my.company.app.lib.instantiate
+import my.company.app.lib.ktor.getKoin
 import my.company.app.lib.lazy
 import my.company.app.lib.logger
 import my.company.app.lib.swagger.SwaggerConfiguration
 import my.company.app.web.interceptor.AuthInterceptor
 import my.company.app.web.interceptor.CorsInterceptor
 import org.koin.core.Koin
-import org.koin.ktor.ext.getKoin
 import java.lang.reflect.Modifier
 import kotlin.reflect.KClass
 import kotlin.system.measureTimeMillis
@@ -58,7 +58,7 @@ class WebRoutingFeature {
 
     private fun install(application: Application) = with(application) {
         val time = measureTimeMillis {
-            val koin = getKoin()
+            val koin = getKoin().koin
             routing {
                 CorsInterceptor().register(this, ApplicationCallPipeline.Call)
                 AuthInterceptor().register(this, ApplicationCallPipeline.Call)

@@ -8,13 +8,13 @@ import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import io.ktor.http.HttpStatusCode
+import my.company.app.lib.di.KoinContext
 import my.company.app.lib.eager
 import my.company.app.lib.singleInstance
 import my.company.app.lib.validation.Email
 import my.company.app.lib.validation.NotBlank
 import my.company.app.lib.validation.Password
 import org.jooq.Record
-import org.koin.core.context.GlobalContext
 import org.koin.core.definition.BeanDefinition
 import org.koin.core.definition.Kind
 import org.koin.core.definition.Options
@@ -36,15 +36,13 @@ fun HttpStatusCode?.expectOK() = assertThat(this).isEqualTo(HttpStatusCode.OK)
 inline fun <reified BEAN : Any> declareSpy(qualifier: Qualifier? = null): BEAN {
     val bean = eager(BEAN::class, qualifier)
     val spy = Mockito.spy(bean)!!
-    val koin = GlobalContext.get()
-    koin.modules(module { single(override = true, createdAtStart = true, qualifier = qualifier) { spy } })
+    KoinContext.koinApplication.modules(module { single(override = true, createdAtStart = true, qualifier = qualifier) { spy } })
     return spy
 }
 
 inline fun <reified BEAN : Any> declareMock(qualifier: Qualifier? = null): BEAN {
     val mock = Mockito.mock(BEAN::class.java)!!
-    val koin = GlobalContext.get()
-    koin.modules(module { single(override = true, createdAtStart = true, qualifier = qualifier) { mock } })
+    KoinContext.koinApplication.modules(module { single(override = true, createdAtStart = true, qualifier = qualifier) { mock } })
     return mock
 }
 

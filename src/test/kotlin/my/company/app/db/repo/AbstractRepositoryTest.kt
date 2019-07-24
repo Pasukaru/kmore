@@ -5,17 +5,21 @@ import kotlinx.coroutines.withContext
 import my.company.app.initConfig
 import my.company.app.lib.TransactionContext
 import my.company.app.lib.containerModule
+import my.company.app.lib.di.KoinContext
+import my.company.app.lib.di.KoinCoroutineInterceptor
 import my.company.app.lib.eager
 import my.company.app.lib.ktor.FlywayFeature
 import my.company.app.lib.ktor.HikariCPFeature
 import my.company.app.lib.repository.Repositories
+import my.company.app.test.AbstractTest
 import my.company.app.test.fixtures.DbFixtures
 import org.junit.jupiter.api.Tag
-import org.koin.core.context.startKoin
-import org.koin.core.context.stopKoin
+import org.junit.jupiter.api.parallel.Execution
+import org.junit.jupiter.api.parallel.ExecutionMode
 
 @Tag("Repository")
-abstract class AbstractRepositoryTest {
+@Execution(ExecutionMode.SAME_THREAD)
+abstract class AbstractRepositoryTest : AbstractTest() {
 
     companion object {
         protected val config by lazy { initConfig("test") }
@@ -35,7 +39,7 @@ abstract class AbstractRepositoryTest {
 
     protected fun queryTest(testFn: suspend () -> Unit) = runBlocking {
         resetDatabase()
-        startKoin {
+        val koin = KoinContext.startKoin {
             modules(listOf(
                 containerModule<Repositories>()
             ))
@@ -45,14 +49,14 @@ abstract class AbstractRepositoryTest {
         try {
             val tx = TransactionContext(hikari.connection)
             try {
-                withContext(tx) {
+                withContext(KoinCoroutineInterceptor(koin) + tx) {
                     testFn()
                 }
             } finally {
                 hikari.evictConnection(tx.connection)
             }
         } finally {
-            stopKoin()
+            KoinContext.stopKoin()
         }
     }
 }

@@ -17,17 +17,13 @@ object AppConfigLoader {
     private val SYSTEM_CLASS_LOADER = ClassLoader.getSystemClassLoader()
     private val FILE_CLASS_LOADER = FileClassLoader()
     private val cache = mutableMapOf<String?, AppConfig>()
-    private var currentConfig: AppConfig? = null
 
     private val applicationConfig: Config by lazy { loadFile("application.conf") }
 
     fun loadProfile(profile: String? = null): AppConfig {
-        val config = cache.getOrPut(profile) {
+        return cache.getOrPut(profile) {
             AppConfig(profile, profile?.let(::loadFullProfile) ?: applicationConfig)
         }
-        if (currentConfig != config) initLogging(config)
-        currentConfig = config
-        return config
     }
 
     private fun loadFile(name: String): Config {
@@ -51,7 +47,7 @@ object AppConfigLoader {
         return loadFile("application-$profile.conf")
     }
 
-    private fun initLogging(appConfig: AppConfig) {
+    fun initLogging(appConfig: AppConfig) {
         val fac = LoggerFactory.getILoggerFactory() as LoggerContext
         val rootLogger = fac.getLogger("ROOT")
 

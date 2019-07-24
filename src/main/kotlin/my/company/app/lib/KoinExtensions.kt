@@ -1,8 +1,15 @@
 package my.company.app.lib
 
+import io.ktor.application.Application
+import io.ktor.application.ApplicationCall
+import io.ktor.application.application
+import io.ktor.util.pipeline.PipelineContext
+import kotlinx.coroutines.withContext
 import my.company.app.PackageNoOp
+import my.company.app.lib.di.KoinContext
+import my.company.app.lib.di.KoinCoroutineInterceptor
+import my.company.app.lib.ktor.getKoin
 import org.koin.core.Koin
-import org.koin.core.context.GlobalContext
 import org.koin.core.definition.BeanDefinition
 import org.koin.core.definition.Kind
 import org.koin.core.definition.Options
@@ -19,10 +26,25 @@ import kotlin.reflect.full.primaryConstructor
 private val KoinLogger = logger(PackageNoOp::class.java.packageName + ".Koin")
 
 inline fun <reified T : Any> eager(qualifier: Qualifier? = null): T = eager(T::class, qualifier)
-fun <T : Any> eager(type: KClass<T>, qualifier: Qualifier? = null): T = GlobalContext.get().koin.get(type, qualifier, null)
+fun <T : Any> eager(type: KClass<T>, qualifier: Qualifier? = null): T {
+    val koin = KoinContext.koinOrNull ?: error("${Thread.currentThread().name} Failed to inject $type (qualified by: $qualifier): KoinApplication has not been started")
+    return koin.get(type, qualifier, null)
+}
 
 inline fun <reified T : Any> lazy(qualifier: Qualifier? = null) = lazy(T::class, qualifier)
 fun <T : Any> lazy(type: KClass<T>, qualifier: Qualifier? = null) = lazy { eager(type, qualifier) }
+
+suspend inline fun <T> PipelineContext<*, ApplicationCall>.withKoin(
+    noinline block: suspend PipelineContext<*, ApplicationCall>.() -> T
+): T {
+    return application.withKoin { block() }
+}
+
+suspend fun <T> Application.withKoin(block: suspend () -> T): T {
+    val koin = getKoin()
+    KoinContext.KOIN.set(koin)
+    return withContext(KoinCoroutineInterceptor(koin)) { block() }
+}
 
 fun Koin.resolveParameters(fn: KFunction<*>): Map<KParameter, Any> {
     return fn.parameters.associateWith { parameter ->

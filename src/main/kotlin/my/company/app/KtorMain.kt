@@ -19,6 +19,7 @@ import my.company.app.business_logic.session.SessionActions
 import my.company.app.business_logic.user.UserActions
 import my.company.app.conf.AppConfig
 import my.company.app.conf.AppConfigLoader
+import my.company.app.conf.AppConfigLoader.initLogging
 import my.company.app.db.ModelGenerator
 import my.company.app.lib.AuthorizationService
 import my.company.app.lib.IdGenerator
@@ -29,17 +30,18 @@ import my.company.app.lib.containerModule
 import my.company.app.lib.eager
 import my.company.app.lib.ktor.ApplicationWarmup
 import my.company.app.lib.ktor.HikariCPFeature
+import my.company.app.lib.ktor.KoinFeature
 import my.company.app.lib.ktor.StartupLog
+import my.company.app.lib.ktor.getKoin
 import my.company.app.lib.ktor.uuidConverter
 import my.company.app.lib.logger
 import my.company.app.lib.repository.Repositories
 import my.company.app.lib.swagger.SwaggerConfiguration
 import my.company.app.lib.validation.ValidationService
+import my.company.app.lib.withKoin
 import my.company.app.web.GlobalWebErrorHandler
 import my.company.app.web.WebRoutingFeature
-import org.koin.core.context.GlobalContext
 import org.koin.dsl.module
-import org.koin.ktor.ext.Koin
 import org.reflections.Reflections
 import springfox.documentation.builders.ParameterBuilder
 import springfox.documentation.schema.ModelRef
@@ -66,7 +68,8 @@ class KtorMain {
     }
 
     fun main() {
-        initConfig(System.getenv("PROFILE"))
+        val config = initConfig(System.getenv("PROFILE"))
+        initLogging(config)
         embeddedServer(
             Netty,
             port = appConfig.ktorPort,
@@ -95,7 +98,7 @@ fun Application.mainModule() {
     install(CallLogging)
     install(Locations)
 
-    install(Koin) {
+    install(KoinFeature) {
         modules(
             listOf(
                 module {
@@ -133,6 +136,8 @@ fun Application.mainModule() {
         )
     }
 
+    val koin = getKoin()
+
     install(DataConversion) {
         uuidConverter()
     }
@@ -143,7 +148,7 @@ fun Application.mainModule() {
             configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
             configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
             configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false) // Instead of throwing an exception, ignore additional json properties that don't exist in our DTOs
-            GlobalContext.get().modules(module { single(createdAtStart = true) { this@jackson } })
+            getKoin().modules(module { single(createdAtStart = true) { this@jackson } })
         }
     }
 
@@ -152,8 +157,11 @@ fun Application.mainModule() {
     install(WebRoutingFeature)
     install(StatusPages) {
         exception<Throwable> { error ->
-            if (!eager<GlobalWebErrorHandler>().handleError(this, error)) {
-                KtorMain.logger.error("Caught unhandled error:", error)
+            withKoin {
+                val errorHandler = eager<GlobalWebErrorHandler>()
+                if (!errorHandler.handleError(this@exception, error)) {
+                    KtorMain.logger.error("Caught unhandled error:", error)
+                }
             }
         }
     }

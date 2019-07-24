@@ -33,8 +33,7 @@ class CreateUserActionTest : AbstractActionTest() {
 
     private lateinit var passwordHelper: PasswordHelper
 
-    override fun beforeEach() {
-        super.beforeEach()
+    override fun beforeEach() = super.beforeEach().also {
         passwordHelper = declareMock()
     }
 

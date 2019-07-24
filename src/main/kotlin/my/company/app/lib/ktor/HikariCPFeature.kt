@@ -8,7 +8,6 @@ import io.ktor.util.AttributeKey
 import my.company.app.conf.AppConfig
 import my.company.app.lib.eager
 import my.company.app.lib.logger
-import org.koin.core.context.GlobalContext
 import org.koin.dsl.module
 import org.koin.dsl.onClose
 
@@ -40,8 +39,8 @@ class HikariCPFeature {
 
             val feature = HikariCPFeature()
 
-            GlobalContext.get().modules(module {
-                single { hikari(eager()) } onClose {
+            pipeline.getKoin().modules(module {
+                single { hikari(eager()) }.onClose {
                     it?.let {
                         logger.debug("Shutting down Hikari connection pool")
                         it.shutdown()
