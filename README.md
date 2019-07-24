@@ -25,6 +25,10 @@
 
 http://localhost:8080/swagger/index.html?url=swagger.json
 
+## Intellij Code Style
+
+Import `intellij-codestyle.xml` via `Preferences` -> `Settings` -> `Code Style`
+
 ## Tests
 
 Tests are setup to run concurrently by default.
