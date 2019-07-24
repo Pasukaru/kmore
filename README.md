@@ -20,10 +20,14 @@
 
 1. Create a run configuration for `my.company.app.KtorMainKt`
 2. Add environment variable `PROFILE=local-dev`
+3. Start the containers: `cd docker; docker-compose up -d`
+4. Start the server
 
 ## Swagger
 
 http://localhost:8080/swagger/index.html?url=swagger.json
+
+In local dev mode, BasicAuth username and password will be `swagger`
 
 ## Intellij Code Style
 

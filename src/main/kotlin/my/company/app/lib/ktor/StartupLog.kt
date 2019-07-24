@@ -4,6 +4,8 @@ import io.ktor.application.Application
 import io.ktor.application.ApplicationFeature
 import io.ktor.application.ApplicationStarted
 import io.ktor.util.AttributeKey
+import my.company.app.conf.AppConfig
+import my.company.app.lib.eager
 import my.company.app.lib.logger
 import java.lang.management.ManagementFactory
 import java.time.Duration
@@ -20,6 +22,10 @@ object StartupLog : ApplicationFeature<Application, Unit, StartupLog> {
             Date(ManagementFactory.getRuntimeMXBean().startTime)
             val duration = Duration.ofMillis(System.currentTimeMillis() - ManagementFactory.getRuntimeMXBean().startTime)
             logger.info("Server started in ${duration.toMinutesPart()}m ${duration.toSecondsPart()}.${duration.toMillisPart()}s.")
+            val appConfig = eager<AppConfig>()
+            if (appConfig.isDev) {
+                logger.info("Swagger: http://localhost:${appConfig.ktorPort}/swagger")
+            }
         }
         return StartupLog
     }

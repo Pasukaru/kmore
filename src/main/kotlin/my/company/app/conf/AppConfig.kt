@@ -12,8 +12,8 @@ class AppConfig(
 
     val swaggerPassword: String = config.getString("swagger.password")
 
-    val isDev: Boolean = config.getString("ktor.environment") != "dev"
-    val isTest: Boolean = config.getString("ktor.environment") != "test"
+    val isDev: Boolean = config.getString("ktor.environment") == "dev"
+    val isTest: Boolean = config.getString("ktor.environment") == "test"
     val isProd: Boolean = !isDev && !isTest
 
     val logLevels by lazy {

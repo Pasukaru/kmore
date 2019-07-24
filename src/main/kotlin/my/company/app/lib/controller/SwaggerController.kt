@@ -10,6 +10,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.OutgoingContent
 import io.ktor.http.withCharset
 import io.ktor.response.respond
+import io.ktor.response.respondRedirect
 import io.ktor.routing.Routing
 import io.ktor.routing.get
 import my.company.app.lib.eager
@@ -29,6 +30,9 @@ class SwaggerController : Controller {
     }
 
     override val routing: Routing.() -> Unit = {
+        get("/swagger"){
+            call.respondRedirect("/swagger/index.html?url=swagger.json")
+        }
         get("/swagger/{fileName}") {
             val fileName = call.parameters["fileName"]
             if (fileName == null) {
