@@ -14,6 +14,7 @@
 * Global error handling
 * Authentication (via token in custom header `X-Auth-Token`)
 * Authorization
+* Parallel test execution
 
 ## How to run: 
 
@@ -23,6 +24,11 @@
 ## Swagger
 
 http://localhost:8080/swagger/index.html?url=swagger.json
+
+## Tests
+
+Tests are setup to run concurrently by default.
+Any test that does not support concurrency (i.e: postgres integration tests) need to be annotated with `@Execution(ExecutionMode.SAME_THREAD)`
 
 ## TODOs
 

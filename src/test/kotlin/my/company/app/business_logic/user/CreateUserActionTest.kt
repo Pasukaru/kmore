@@ -22,8 +22,6 @@ import my.company.app.test.expectPasswordValidation
 import my.company.app.test.singleValue
 import my.company.jooq.tables.records.UserRecord
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.parallel.Execution
-import org.junit.jupiter.api.parallel.ExecutionMode
 import org.mockito.ArgumentCaptor
 import org.mockito.Mockito
 import java.time.Instant
@@ -67,7 +65,6 @@ class CreateUserActionTest : AbstractActionTest() {
     }
 
     @Test
-    @Execution(ExecutionMode.CONCURRENT)
     fun requestIsValidated() {
         expectEmailValidation(CreateUserRequest::email)
         expectNotBlankValidation(CreateUserRequest::firstName)

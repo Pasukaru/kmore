@@ -15,14 +15,11 @@ import my.company.app.test.expectPasswordValidation
 import my.company.app.test.singleValue
 import my.company.app.web.controller.BaseWebControllerTest
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.parallel.Execution
-import org.junit.jupiter.api.parallel.ExecutionMode
 import org.mockito.Mockito
 
 class WebCreateUserTest : BaseWebControllerTest(WebCreateUserLocation::class) {
 
     @Test
-    @Execution(ExecutionMode.CONCURRENT)
     fun requestIsValidated() {
         expectEmailValidation(WebCreateUserRequest::email)
         expectNotBlankValidation(WebCreateUserRequest::firstName)

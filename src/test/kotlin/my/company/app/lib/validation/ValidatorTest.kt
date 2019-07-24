@@ -5,11 +5,8 @@ import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import my.company.app.lib.Faker
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.parallel.Execution
-import org.junit.jupiter.api.parallel.ExecutionMode
 import javax.validation.ConstraintValidator
 
-@Execution(ExecutionMode.CONCURRENT)
 class ValidatorTest {
 
     @Test

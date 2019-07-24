@@ -19,6 +19,7 @@ abstract class AbstractTest {
                     if (!started) {
                         val config = initConfig("test")
                         initLogging(config)
+                        println("Logging has been configured according to the test profile: ${config.logLevels}")
                         started = true
                     }
                 }
