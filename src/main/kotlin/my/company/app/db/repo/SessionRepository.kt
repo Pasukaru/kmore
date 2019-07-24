@@ -1,4 +1,4 @@
-package my.company.app.db.user
+package my.company.app.db.repo
 
 import my.company.app.lib.repository.AbstractRepository
 import my.company.jooq.Tables.SESSION

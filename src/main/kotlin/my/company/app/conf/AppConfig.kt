@@ -6,7 +6,7 @@ import com.typesafe.config.ConfigValue
 @Suppress("EXPERIMENTAL_API_USAGE")
 class AppConfig(
     val profile: String?,
-    config: Config
+    private val config: Config
 ) {
     val ktorPort = config.getInt("ktor.port")
 
@@ -22,6 +22,26 @@ class AppConfig(
             .getObject("logging")
             .forEach { key, value -> resolveLogLevel(map, key, value) }
         map.toSortedMap() as Map<String, String>
+    }
+
+    val database = Database()
+
+    inner class Database {
+        val host: String = config.getString("database.host")
+        val port: Int = config.getInt("database.port")
+        val name: String = config.getString("database.name")
+        val driver: String = config.getString("database.driver")
+        val username: String = config.getString("database.username")
+        val password: String = config.getString("database.password")
+        val jdbcUrl: String = "jdbc:postgresql://$host:$port/$name"
+        val poolMaxSize: Int = config.getInt("database.poolMaxSize")
+        val poolMinIdle: Int = config.getInt("database.poolMinIdle")
+    }
+
+    val flyway = Flyway()
+
+    inner class Flyway {
+        val enabled: Boolean = config.getBoolean("flyway.enabled")
     }
 
     fun resolveLogLevel(map: MutableMap<String, String>, logger: String, value: Any) {

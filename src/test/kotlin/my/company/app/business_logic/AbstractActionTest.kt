@@ -11,7 +11,7 @@ import my.company.app.lib.TimeService
 import my.company.app.lib.eager
 import my.company.app.lib.repository.Repositories
 import my.company.app.lib.validation.ValidationService
-import my.company.app.test.Fixtures
+import my.company.app.test.fixtures.InMemoryFixtures
 import my.company.app.test.mockedContainerModule
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
@@ -28,7 +28,7 @@ abstract class AbstractActionTest {
     lateinit var spiedModelGenerator: ModelGenerator
     lateinit var mockedAuthorizationService: AuthorizationService
 
-    protected val fixtures = Fixtures
+    protected val fixtures = InMemoryFixtures
 
     open fun beforeEach() {
         startKoin {

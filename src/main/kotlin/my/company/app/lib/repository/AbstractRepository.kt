@@ -39,6 +39,7 @@ abstract class AbstractRepository<ID, TABLE : Table<RECORD>, RECORD : Record>(
         val q = dsl.insertInto(table).set(record)
         val rows = execute(q)
         if (rows != 1) throw SQLDataException("Failed to insert row")
+        record.changed(false)
         return record
     }
 
@@ -49,6 +50,7 @@ abstract class AbstractRepository<ID, TABLE : Table<RECORD>, RECORD : Record>(
         val q = dsl.update(table).set(record).where(primaryKey.eq(record.id))
         val rows = execute(q)
         if (rows != 1) throw SQLDataException("Failed to update row")
+        record.changed(false)
         return record
     }
 

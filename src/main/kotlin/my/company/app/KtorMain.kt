@@ -20,7 +20,6 @@ import my.company.app.business_logic.user.UserActions
 import my.company.app.conf.AppConfig
 import my.company.app.conf.AppConfigLoader
 import my.company.app.db.ModelGenerator
-import my.company.app.db.jooq.HikariCPFeature
 import my.company.app.lib.AuthorizationService
 import my.company.app.lib.IdGenerator
 import my.company.app.lib.PasswordHelper
@@ -29,6 +28,7 @@ import my.company.app.lib.TransactionService
 import my.company.app.lib.containerModule
 import my.company.app.lib.eager
 import my.company.app.lib.ktor.ApplicationWarmup
+import my.company.app.lib.ktor.HikariCPFeature
 import my.company.app.lib.ktor.StartupLog
 import my.company.app.lib.ktor.uuidConverter
 import my.company.app.lib.logger
@@ -55,15 +55,14 @@ class KtorMain {
     companion object {
         const val GRADE_PERIOD_IN_SECONDS = 1L
         const val SHUTDOWN_TIMEOUT_IN_SECONDS = 5L
-        val REFLECTIONS: Reflections
+        val REFLECTIONS: Reflections by lazy {
+            val start = System.currentTimeMillis()
+            val r = Reflections(PackageNoOp::class.java.`package`.name)
+            logger.info("Classpath scanning took: ${System.currentTimeMillis() - start}ms")
+            r
+        }
 
         val logger = logger<KtorMain>()
-
-        init {
-            val start = System.currentTimeMillis()
-            REFLECTIONS = Reflections(PackageNoOp::class.java.`package`.name)
-            logger.info("Classpath scanning took: ${System.currentTimeMillis() - start}ms")
-        }
     }
 
     fun main() {

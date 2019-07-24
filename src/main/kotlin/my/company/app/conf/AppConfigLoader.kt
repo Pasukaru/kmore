@@ -19,17 +19,13 @@ object AppConfigLoader {
     private val cache = mutableMapOf<String?, AppConfig>()
     private var currentConfig: AppConfig? = null
 
+    private val applicationConfig: Config by lazy { loadFile("application.conf") }
+
     fun loadProfile(profile: String? = null): AppConfig {
         val config = cache.getOrPut(profile) {
-            val applicationConfig = loadFile("application.conf")
-            val mergedConfig = profile?.let { applicationConfig.includeProfile(it) } ?: applicationConfig
-            AppConfig(profile, mergedConfig)
+            AppConfig(profile, profile?.let(::loadFullProfile) ?: applicationConfig)
         }
-
-        if (config != currentConfig) {
-            initLogging(config)
-        }
-
+        if (currentConfig != config) initLogging(config)
         currentConfig = config
         return config
     }
@@ -39,16 +35,20 @@ object AppConfigLoader {
         return ConfigFactory.load(SYSTEM_CLASS_LOADER, name)
     }
 
-    private fun Config.includeProfile(name: String): Config {
-        loadFile("application-$name.conf")
-        val config = withFallback(loadFile("application-$name.conf"))
-        return config.loadIncludes()
+    private fun loadFullProfile(profile: String): Config {
+        val configs = mutableListOf<Config>()
+        var current: Config? = loadFile("application-$profile.conf")
+        while (current != null) {
+            configs.add(current)
+            current = current.loadInclude()
+        }
+        configs.add(applicationConfig)
+        return configs.reduce { a, b -> a.withFallback(b) }
     }
 
-    private fun Config.loadIncludes(): Config {
-        val fallbackProfile = tryGetString("profile.include") ?: return this
-        val fallbackConfig = loadFile("application-$fallbackProfile.conf")
-        return withFallback(fallbackConfig.loadIncludes())
+    private fun Config.loadInclude(): Config? {
+        val profile = tryGetString("profile.include") ?: return null
+        return loadFile("application-$profile.conf")
     }
 
     private fun initLogging(appConfig: AppConfig) {

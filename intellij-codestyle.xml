@@ -1,5 +1,11 @@
 <code_scheme name="Project" version="173">
   <option name="RIGHT_MARGIN" value="300" />
+    <HoconCodeStyleSettings>
+        <option name="KEEP_BLANK_LINES_IN_OBJECTS" value="1"/>
+        <option name="KEEP_BLANK_LINES_IN_LISTS" value="0"/>
+        <option name="KEEP_BLANK_LINES_BEFORE_RBRACE" value="0"/>
+        <option name="KEEP_BLANK_LINES_BEFORE_RBRACKET" value="0"/>
+    </HoconCodeStyleSettings>
   <JavaCodeStyleSettings>
     <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="999" />
     <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="999" />
@@ -67,6 +73,13 @@
     <option name="WRAP_INSIDE_CALL_EXPRESSION" value="0" />
     <option name="WRAP_PARENTHESIZED_EXPRESSION_INSIDE_VALUES" value="0" />
   </SqlCodeStyleSettings>
+    <codeStyleSettings language="HOCON">
+        <indentOptions>
+            <option name="INDENT_SIZE" value="4"/>
+            <option name="CONTINUATION_INDENT_SIZE" value="4"/>
+            <option name="TAB_SIZE" value="4"/>
+        </indentOptions>
+    </codeStyleSettings>
   <codeStyleSettings language="SQL">
     <option name="KEEP_LINE_BREAKS" value="false" />
     <indentOptions>

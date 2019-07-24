@@ -5,6 +5,7 @@ import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isNotNull
+import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import io.ktor.http.HttpStatusCode
 import my.company.app.lib.eager
@@ -100,6 +101,26 @@ fun Record.expectChanged(field: String) {
     // Null fields are not marked as changed on init
     val changed = this.changed(field) || this[field] == null
     assertThat(changed, "Expected $field to have been changed").isTrue()
+}
+
+fun <T : Any> T?.expectNotNull(name: String? = null): T {
+    assertThat(this, name).isNotNull()
+    return this!!
+}
+
+fun <T : Any> T?.expectNull(name: String? = null): T? {
+    assertThat(this, name).isNull()
+    return null
+}
+
+fun Boolean.expectTrue(name: String? = null): Boolean {
+    assertThat(this, name).isTrue()
+    return this
+}
+
+fun Boolean.expectFalse(name: String? = null): Boolean {
+    assertThat(this, name).isFalse()
+    return this
 }
 
 fun expectNotNullProperty(property: KProperty<*>) {
