@@ -29,6 +29,12 @@ http://localhost:8080/swagger/index.html?url=swagger.json
 
 Import `intellij-codestyle.xml` via `Preferences` -> `Settings` -> `Code Style`
 
+## Detekt
+
+A pre-commit hook is automatically installed when running gradle.
+It will only run detekt on VCS changed files
+To manually run detekt execute `./scripts/detekt.sh`
+
 ## Tests
 
 Tests are setup to run concurrently by default.
