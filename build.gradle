@@ -59,7 +59,6 @@ dependencies {
     compile group: 'io.ktor', name: 'ktor-server-core', version: ktorVersion
     compile group: 'io.ktor', name: 'ktor-server-netty', version: ktorVersion
     compile group: 'io.ktor', name: 'ktor-websockets', version: ktorVersion
-    implementation group: 'io.ktor', name: 'ktor-jackson', version: ktorVersion
     implementation group: 'io.ktor', name: 'ktor-locations', version: ktorVersion
     compile group: 'org.koin', name: 'koin-core', version: koinVersion
 
@@ -72,17 +71,19 @@ dependencies {
 
     compile group: 'io.springfox', name: 'springfox-swagger2', version: swaggerVersion
     compile group: 'org.springframework', name: 'spring-web', version: '3.0.2.RELEASE' // Springfox depends on this for HttpMethods
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.9' // Springfox depends on this
 
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
     compile group: 'org.reflections', name: 'reflections', version: '0.9.11'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.26'
     compile group: 'org.jooq', name: 'jooq', version: jooqVersion
     compile group: 'javax.annotation', name: 'javax.annotation-api', version: '1.2'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.9'
+    compile group:  'com.squareup.moshi', name: 'moshi-kotlin', version: '1.8.0'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
     compile group: 'com.github.javafaker', name: 'javafaker', version: '1.0.0'
 
     testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.5.1'
+    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.5.1'
     testCompile group: 'io.ktor', name: 'ktor-server-test-host', version: ktorVersion
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.0.0'
     testCompile group: 'org.mockito', name: 'mockito-inline', version: '3.0.0'
@@ -120,6 +121,9 @@ compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
 
+test {
+    useJUnitPlatform()
+}
 
 task run(type: JavaExec) {
     dependsOn(build)

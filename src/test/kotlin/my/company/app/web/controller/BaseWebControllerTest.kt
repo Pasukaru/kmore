@@ -2,9 +2,10 @@ package my.company.app.web.controller
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.times
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCallPipeline
 import io.ktor.http.ContentType
@@ -33,6 +34,7 @@ import my.company.app.lib.validation.ValidationService
 import my.company.app.mainModule
 import my.company.app.test.AbstractTest
 import my.company.app.test.declareMock
+import my.company.app.test.expectNotNull
 import my.company.app.test.fixtures.InMemoryFixtures
 import my.company.app.web.ErrorResponse
 import my.company.app.web.getPathFromLocation
@@ -48,7 +50,7 @@ abstract class BaseWebControllerTest(
 
     protected inline fun TestApplicationEngine.jsonPost(body: Any, crossinline setup: TestApplicationRequest.() -> Unit = {}, testFn: TestApplicationCall.() -> Unit = {}) {
         with(handleRequest(HttpMethod.Post, url) {
-            val content = eager<ObjectMapper>().writeValueAsString(body).toByteArray(Charsets.UTF_8)
+            val content = eager<Moshi>().adapter<Any>(body::class.java).toJson(body).toByteArray(Charsets.UTF_8)
             addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             setBody(content)
             addHeader(HttpHeaders.ContentLength, content.size.toString())
@@ -119,21 +121,23 @@ abstract class BaseWebControllerTest(
         Mockito.verify(eager<TransactionService>(), times(1)).transaction<Any>(any())
     }
 
-    inline fun <reified RESPONSE_BODY> TestApplicationCall.jsonResponse(): RESPONSE_BODY = response.jsonResponse()
-    inline fun <reified RESPONSE_BODY> TestApplicationResponse.jsonResponse(): RESPONSE_BODY {
-        return eager<ObjectMapper>().readValue(content, RESPONSE_BODY::class.java)
+    inline fun <reified RESPONSE_BODY : Any> TestApplicationCall.jsonResponse(): RESPONSE_BODY = response.jsonResponse()
+    inline fun <reified RESPONSE_BODY : Any> TestApplicationResponse.jsonResponse(): RESPONSE_BODY {
+        val str = content.expectNotNull()
+        return eager<Moshi>().adapter<RESPONSE_BODY>(RESPONSE_BODY::class.java).fromJson(str).expectNotNull()
     }
 
     fun <RESPONSE_BODY : Any> TestApplicationCall.jsonResponse(responseBody: KClass<RESPONSE_BODY>): RESPONSE_BODY = response.jsonResponse(responseBody)
     fun <RESPONSE_BODY : Any> TestApplicationResponse.jsonResponse(responseBody: KClass<RESPONSE_BODY>): RESPONSE_BODY {
-        return eager<ObjectMapper>().readValue(content, responseBody.java)
+        val str = content.expectNotNull()
+        return eager<Moshi>().adapter<RESPONSE_BODY>(responseBody.java).fromJson(str).expectNotNull()
     }
 
     inline fun <reified RESPONSE_BODY> TestApplicationCall.jsonResponseList(): List<RESPONSE_BODY> = response.jsonResponseList()
     inline fun <reified RESPONSE_BODY> TestApplicationResponse.jsonResponseList(): List<RESPONSE_BODY> {
-        val om = eager<ObjectMapper>()
-        val type = om.typeFactory.constructCollectionLikeType(ArrayList::class.java, RESPONSE_BODY::class.java)
-        return om.readValue(content, type)
+        val type = Types.newParameterizedType(List::class.java, RESPONSE_BODY::class.java)
+        val str = content.expectNotNull()
+        return eager<Moshi>().adapter<List<RESPONSE_BODY>>(type).fromJson(str) ?: emptyList()
     }
 
     fun TestApplicationResponse.expectError(status: HttpStatusCode, error: Throwable) {

@@ -2,15 +2,12 @@
 
 package my.company.app
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.SerializationFeature
 import io.ktor.application.Application
 import io.ktor.application.install
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.DataConversion
 import io.ktor.features.StatusPages
-import io.ktor.jackson.jackson
 import io.ktor.locations.Locations
 import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
@@ -33,6 +30,7 @@ import my.company.app.lib.ktor.HikariCPFeature
 import my.company.app.lib.ktor.KoinFeature
 import my.company.app.lib.ktor.StartupLog
 import my.company.app.lib.ktor.getKoin
+import my.company.app.lib.ktor.moshi
 import my.company.app.lib.ktor.uuidConverter
 import my.company.app.lib.logger
 import my.company.app.lib.repository.Repositories
@@ -141,13 +139,8 @@ fun Application.mainModule() {
     }
 
     install(ContentNegotiation) {
-        jackson {
-            configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
-            configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-            configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
-            configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false) // Instead of throwing an exception, ignore additional json properties that don't exist in our DTOs
-            getKoin().modules(module { single(createdAtStart = true) { this@jackson } })
-        }
+        val moshi = moshi {}
+        getKoin().modules(module { single(createdAtStart = true) { moshi } })
     }
 
     install(HikariCPFeature)

@@ -1,9 +1,6 @@
 package my.company.app.web
 
-import com.fasterxml.jackson.core.JsonParseException
-import com.fasterxml.jackson.databind.JsonMappingException
-import com.fasterxml.jackson.databind.exc.MismatchedInputException
-import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
+import com.squareup.moshi.JsonDataException
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.http.HttpStatusCode
@@ -19,8 +16,6 @@ import javax.validation.ConstraintViolation
 
 class GlobalWebErrorHandler {
 
-    private val logger = logger<GlobalWebErrorHandler>()
-
     enum class LogType {
         STACK_TRACE,
         MESSAGE_ONLY,
@@ -28,8 +23,9 @@ class GlobalWebErrorHandler {
     }
 
     companion object {
+        private val JSON_DATA_EXCEPTION_PROPERTY_PATH_PATTERN = Regex("""^.*\$\.([\w.]+).*$""")
         private val VALIDATION_FAILED_MESSAGE = ValidationException(emptySet()).message!!
-        private val INVALID_JSON_MESSAGE = InvalidJsonException().message!!
+        private val logger = logger<GlobalWebErrorHandler>()
     }
 
     // <editor-fold="Handler Methods">
@@ -47,8 +43,7 @@ class GlobalWebErrorHandler {
     suspend fun PipelineContext<Unit, ApplicationCall>.badRequest(e: Throwable, logType: LogType = LogType.STACK_TRACE) {
         log(e, logType)
         val message = when (e) {
-            is MissingKotlinParameterException -> VALIDATION_FAILED_MESSAGE
-            is JsonParseException -> INVALID_JSON_MESSAGE
+            is JsonDataException -> VALIDATION_FAILED_MESSAGE
             else -> defaultMessage(e)
         }
         call.respond(HttpStatusCode.BadRequest, buildResponse(e, message = message))
@@ -76,10 +71,8 @@ class GlobalWebErrorHandler {
 
         when (e) {
             is ValidationException -> badRequest(e, LogType.NOTHING)
-            is MismatchedInputException -> badRequest(e, LogType.NOTHING)
-            is MissingKotlinParameterException -> badRequest(e, LogType.NOTHING)
-            is JsonParseException -> badRequest(e, LogType.NOTHING)
             is InvalidJsonException -> badRequest(e, LogType.NOTHING)
+            is JsonDataException -> badRequest(e, LogType.NOTHING)
             is InvalidLoginCredentialsException -> unauthorized(e, LogType.NOTHING)
             is UserByEmailAlreadyExistsException -> preconditionFailed(e, LogType.NOTHING)
             is InsufficientPermissionsException -> forbidden(e, LogType.NOTHING)
@@ -112,7 +105,7 @@ class GlobalWebErrorHandler {
 
     private fun defaultMessage(e: Throwable): String {
         return when (e) {
-            is MissingKotlinParameterException, is JsonMappingException -> VALIDATION_FAILED_MESSAGE
+            is JsonDataException -> VALIDATION_FAILED_MESSAGE
             else -> e.message ?: e.javaClass.simpleName
         }
     }
@@ -125,27 +118,31 @@ class GlobalWebErrorHandler {
                     errorMessage = it.messageTemplate
                 )
             }
-            is MissingKotlinParameterException -> listOf(
-                ValidationError(
-                    propertyPath = e.formattedPath(),
-                    errorMessage = "{validation.property.missing}"
-                )
-            )
-            is JsonMappingException -> listOf(
-                ValidationError(
-                    propertyPath = e.formattedPath(),
-                    errorMessage = "{validation.property.invalid}"
-                )
-            )
+            is JsonDataException -> listOf(parseJsonDataException(e))
             else -> emptyList()
         }
+    }
+
+    private fun parseJsonDataException(e: JsonDataException): ValidationError {
+        var errorMessage = "{error.property.invalid}"
+        var propertyPath = "<unknown>"
+
+        e.message?.also { error ->
+            when {
+                errorMessage.startsWith("Not-null value") -> errorMessage = "{validation.property.missing}"
+            }
+            val match = JSON_DATA_EXCEPTION_PROPERTY_PATH_PATTERN.matchEntire(error)
+            match?.groups?.last()?.value?.also { propertyPath = it }
+        }
+        return ValidationError(
+            propertyPath = propertyPath,
+            errorMessage = errorMessage
+        )
     }
 
     private fun ConstraintViolation<*>.formattedPath(): String {
         return this.propertyPath.toString()
     }
-
-    private fun JsonMappingException.formattedPath(): String = this.path.map { it.fieldName }.joinToString(".")
 
     // </editor-fold>
 }
