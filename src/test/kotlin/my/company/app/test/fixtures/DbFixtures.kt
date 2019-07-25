@@ -1,6 +1,6 @@
 package my.company.app.test.fixtures
 
-import my.company.app.lib.lazy
+import my.company.app.lib.koin.lazy
 import my.company.app.lib.repository.Repositories
 import my.company.jooq.tables.records.SessionRecord
 import my.company.jooq.tables.records.UserRecord

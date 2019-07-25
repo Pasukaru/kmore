@@ -26,8 +26,9 @@ import my.company.app.lib.IdGenerator
 import my.company.app.lib.PasswordHelper
 import my.company.app.lib.TimeService
 import my.company.app.lib.TransactionService
-import my.company.app.lib.containerModule
-import my.company.app.lib.eager
+import my.company.app.lib.koin.containerModule
+import my.company.app.lib.koin.eager
+import my.company.app.lib.koin.withKoin
 import my.company.app.lib.ktor.ApplicationWarmup
 import my.company.app.lib.ktor.HikariCPFeature
 import my.company.app.lib.ktor.KoinFeature
@@ -38,7 +39,6 @@ import my.company.app.lib.logger
 import my.company.app.lib.repository.Repositories
 import my.company.app.lib.swagger.SwaggerConfiguration
 import my.company.app.lib.validation.ValidationService
-import my.company.app.lib.withKoin
 import my.company.app.web.GlobalWebErrorHandler
 import my.company.app.web.WebRoutingFeature
 import org.koin.dsl.module

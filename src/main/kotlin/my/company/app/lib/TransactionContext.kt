@@ -1,13 +1,14 @@
 package my.company.app.lib
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.withContext
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
 import java.sql.Connection
 import java.util.UUID
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.coroutineContext
 
 class TransactionContext(
     val connection: Connection,
@@ -64,14 +65,14 @@ class TransactionContext(
         if (committed || rolledBack) throw IllegalStateException("Transaction is already completed")
     }
 
-    suspend fun <T> execute(op: suspend Connection.() -> T): T {
+    suspend fun <T> execute(op: suspend Connection.() -> T): T = withContext(Dispatchers.IO) {
         val start = System.currentTimeMillis()
 
         logger.trace("$this: LOCK ${coroutineContext[TransactionContext]}")
         mutex.lock()
         logger.trace("$this: LOCKED ${coroutineContext[TransactionContext]} (${System.currentTimeMillis() - start}ms)")
 
-        return try {
+        return@withContext try {
             expectActive()
             op(connection)
         } finally {

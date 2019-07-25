@@ -3,6 +3,7 @@ package my.company.app.lib
 import com.zaxxer.hikari.pool.HikariPool
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
+import my.company.app.lib.koin.eager
 
 class TransactionService {
     suspend fun <T> transaction(block: suspend CoroutineScope.() -> T): T {

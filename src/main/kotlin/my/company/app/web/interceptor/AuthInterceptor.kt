@@ -13,7 +13,7 @@ import io.ktor.response.respond
 import io.ktor.util.pipeline.PipelineContext
 import my.company.app.conf.AppConfig
 import my.company.app.lib.TransactionService
-import my.company.app.lib.lazy
+import my.company.app.lib.koin.lazy
 import my.company.app.lib.logger
 import my.company.app.lib.tryOrNull
 import my.company.app.web.AuthenticatedUser

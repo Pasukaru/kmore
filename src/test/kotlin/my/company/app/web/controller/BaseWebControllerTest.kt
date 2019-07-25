@@ -26,8 +26,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import my.company.app.initConfig
 import my.company.app.lib.TransactionService
-import my.company.app.lib.di.KoinCoroutineInterceptor
-import my.company.app.lib.eager
+import my.company.app.lib.koin.KoinCoroutineInterceptor
+import my.company.app.lib.koin.eager
 import my.company.app.lib.ktor.getKoin
 import my.company.app.lib.validation.ValidationService
 import my.company.app.mainModule

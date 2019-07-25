@@ -25,7 +25,7 @@ class WebDebugController : AbstractController(Tag(CONTROLLER_NAME, "Debugging en
 
     @Suppress("EXPERIMENTAL_API_USAGE")
     override val routing: Routing.() -> Unit = {
-        pOperations += Get(path = getPathFromLocation(WebDebugPingLocation::class), name = "ping")
+        pOperations += Get(path = getPathFromLocation<WebDebugPingLocation>(), name = "ping")
             .res(ResponseMessage(
                 HttpStatusCode.OK.value,
                 "pong",

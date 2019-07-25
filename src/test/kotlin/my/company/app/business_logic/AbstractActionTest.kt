@@ -8,9 +8,9 @@ import my.company.app.initConfig
 import my.company.app.lib.AuthorizationService
 import my.company.app.lib.IdGenerator
 import my.company.app.lib.TimeService
-import my.company.app.lib.di.KoinContext
-import my.company.app.lib.di.KoinCoroutineInterceptor
-import my.company.app.lib.eager
+import my.company.app.lib.koin.KoinContext
+import my.company.app.lib.koin.KoinCoroutineInterceptor
+import my.company.app.lib.koin.eager
 import my.company.app.lib.repository.Repositories
 import my.company.app.lib.validation.ValidationService
 import my.company.app.test.AbstractTest
@@ -53,16 +53,16 @@ abstract class AbstractActionTest : AbstractTest() {
         return koin
     }
 
-    fun actionTest(testFn: suspend () -> Unit) = runBlocking {
+    fun actionTest(testFn: suspend () -> Unit) {
         val koin = beforeEach()
         try {
-            with(KoinCoroutineInterceptor(koin)) { testFn() }
+            runBlocking(KoinCoroutineInterceptor(koin)) { testFn() }
         } finally {
-            afterEach()
+            afterEach(koin)
         }
     }
 
-    open fun afterEach() {
-        KoinContext.stopKoin()
+    open fun afterEach(koin: KoinApplication) {
+        koin.close()
     }
 }

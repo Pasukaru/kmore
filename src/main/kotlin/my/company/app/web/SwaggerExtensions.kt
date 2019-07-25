@@ -3,7 +3,7 @@ package my.company.app.web
 import com.google.common.base.Optional
 import com.google.common.collect.ArrayListMultimap
 import io.ktor.http.HttpStatusCode
-import my.company.app.lib.lazy
+import my.company.app.lib.koin.lazy
 import my.company.app.lib.swagger.OperationContext
 import my.company.app.lib.swagger.SwaggerConfiguration
 import org.springframework.http.HttpMethod

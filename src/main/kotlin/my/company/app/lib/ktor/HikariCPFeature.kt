@@ -6,7 +6,7 @@ import io.ktor.application.Application
 import io.ktor.application.ApplicationFeature
 import io.ktor.util.AttributeKey
 import my.company.app.conf.AppConfig
-import my.company.app.lib.eager
+import my.company.app.lib.koin.eager
 import my.company.app.lib.logger
 import org.koin.dsl.module
 import org.koin.dsl.onClose

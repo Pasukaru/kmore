@@ -13,7 +13,7 @@ import io.ktor.response.respond
 import io.ktor.response.respondRedirect
 import io.ktor.routing.Routing
 import io.ktor.routing.get
-import my.company.app.lib.eager
+import my.company.app.lib.koin.eager
 import my.company.app.lib.swagger.SwaggerConfiguration
 import java.net.URL
 

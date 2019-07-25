@@ -1,7 +1,6 @@
 package my.company.app.business_logic.user
 
 import assertk.assertThat
-import assertk.assertions.isBetween
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNull
@@ -24,7 +23,6 @@ import my.company.jooq.tables.records.UserRecord
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.Mockito
-import java.time.Instant
 import java.util.UUID
 
 class CreateUserActionTest : AbstractActionTest() {
@@ -85,7 +83,7 @@ class CreateUserActionTest : AbstractActionTest() {
         assertThat(user.firstName).isEqualTo(ctx.request.firstName)
         assertThat(user.lastName).isEqualTo(ctx.request.lastName)
         assertThat(user.password).isEqualTo(ctx.hashedPassword)
-        assertThat(user.createdAt).isBetween(Instant.now().minusSeconds(3), Instant.now())
+        assertThat(user.createdAt).isEqualTo(mockedTimeService.now())
         assertThat(user.updatedAt).isNull()
         user.expectAllChanged()
 

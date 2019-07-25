@@ -9,9 +9,9 @@ import io.ktor.util.AttributeKey
 import my.company.app.KtorMain
 import my.company.app.lib.controller.AbstractController
 import my.company.app.lib.controller.SwaggerController
-import my.company.app.lib.instantiate
+import my.company.app.lib.koin.instantiate
+import my.company.app.lib.koin.lazy
 import my.company.app.lib.ktor.getKoin
-import my.company.app.lib.lazy
 import my.company.app.lib.logger
 import my.company.app.lib.swagger.SwaggerConfiguration
 import my.company.app.web.interceptor.AuthInterceptor

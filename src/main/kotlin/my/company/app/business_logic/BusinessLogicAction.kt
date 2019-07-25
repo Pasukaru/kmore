@@ -3,7 +3,7 @@ package my.company.app.business_logic
 import my.company.app.db.ModelGenerator
 import my.company.app.lib.AuthorizationService
 import my.company.app.lib.TransactionContext
-import my.company.app.lib.lazy
+import my.company.app.lib.koin.lazy
 import my.company.app.lib.logger
 import my.company.app.lib.repository.Repositories
 import my.company.app.lib.validation.ValidationService

@@ -8,9 +8,9 @@ import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.isTrue
 import io.ktor.http.HttpStatusCode
-import my.company.app.lib.di.KoinContext
-import my.company.app.lib.eager
-import my.company.app.lib.singleInstance
+import my.company.app.lib.koin.KoinContext
+import my.company.app.lib.koin.eager
+import my.company.app.lib.koin.singleInstance
 import my.company.app.lib.validation.Email
 import my.company.app.lib.validation.NotBlank
 import my.company.app.lib.validation.Password

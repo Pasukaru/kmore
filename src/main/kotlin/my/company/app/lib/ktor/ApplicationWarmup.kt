@@ -6,7 +6,7 @@ import io.ktor.application.ApplicationFeature
 import io.ktor.util.AttributeKey
 import kotlinx.coroutines.runBlocking
 import my.company.app.business_logic.user.UserActions
-import my.company.app.lib.eager
+import my.company.app.lib.koin.eager
 import my.company.app.lib.logger
 import my.company.app.lib.repository.Repositories
 import kotlin.streams.toList

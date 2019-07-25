@@ -11,7 +11,7 @@ import io.ktor.util.pipeline.PipelineContext
 import kotlinx.coroutines.CoroutineScope
 import my.company.app.lib.TransactionService
 import my.company.app.lib.controller.AbstractController
-import my.company.app.lib.lazy
+import my.company.app.lib.koin.lazy
 import my.company.app.web.EndpointInformation
 import my.company.app.web.Get
 import my.company.app.web.Post
@@ -68,8 +68,8 @@ abstract class AbstractWebController(
         noinline getOp: suspend PipelineContext<Unit, ApplicationCall>.() -> Unit
     ) {
         pOperations += Get(
-            path = getPathFromLocation(LOCATION::class),
-            name = getNameFromLocation(LOCATION::class)
+            path = getPathFromLocation<LOCATION>(),
+            name = getNameFromLocation<LOCATION>()
         ).tag(tag.name).also(swaggerOp).build()
         get<LOCATION> {
             call.setEndpointInformation<LOCATION>(HttpMethod.Get)

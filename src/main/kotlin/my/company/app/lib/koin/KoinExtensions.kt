@@ -1,4 +1,4 @@
-package my.company.app.lib
+package my.company.app.lib.koin
 
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
@@ -6,9 +6,8 @@ import io.ktor.application.application
 import io.ktor.util.pipeline.PipelineContext
 import kotlinx.coroutines.withContext
 import my.company.app.PackageNoOp
-import my.company.app.lib.di.KoinContext
-import my.company.app.lib.di.KoinCoroutineInterceptor
 import my.company.app.lib.ktor.getKoin
+import my.company.app.lib.logger
 import org.koin.core.Koin
 import org.koin.core.definition.BeanDefinition
 import org.koin.core.definition.Kind
