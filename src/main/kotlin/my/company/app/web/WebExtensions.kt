@@ -10,22 +10,8 @@ import kotlinx.coroutines.withContext
 import my.company.app.lib.di.KoinCoroutineInterceptor
 import my.company.app.lib.ktor.getKoin
 import my.company.app.web.auth.WebSessionPrincipal
-import my.company.app.web.controller.WebLocation
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
-
-fun PipelineContext<*, ApplicationCall>.isWebRequest(): Boolean {
-    return call.isWebRequest()
-}
-
-fun ApplicationCall.isWebRequest(): Boolean {
-    return request.local.uri.startsWith(WebLocation.PATH)
-}
-
-fun PipelineContext<*, ApplicationCall>.isSwaggerRequest(): Boolean {
-    val uri = call.request.local.uri
-    return uri.startsWith("/swagger")
-}
 
 suspend inline fun <T> PipelineContext<*, ApplicationCall>.withKoin(
     noinline block: suspend PipelineContext<*, ApplicationCall>.() -> T
