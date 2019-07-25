@@ -13,8 +13,11 @@ import my.company.app.lib.ktor.HikariCPFeature
 import my.company.app.lib.repository.Repositories
 import my.company.app.test.AbstractTest
 import my.company.app.test.fixtures.DbFixtures
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.parallel.ResourceLock
+import org.koin.core.KoinApplication
 
 @Tag("Repository")
 @ResourceLock("Database")
@@ -39,28 +42,34 @@ abstract class AbstractRepositoryTest : AbstractTest() {
         hikari.evictConnection(con)
     }
 
-    protected fun queryTest(testFn: suspend () -> Unit) {
-        resetDatabase()
-        val koin = KoinContext.startKoin {
+    protected lateinit var koin: KoinApplication
+
+    @BeforeEach
+    protected fun beforeEach() {
+        koin = KoinContext.startKoin {
             modules(listOf(
                 containerModule<Repositories>()
             ))
         }
+        resetDatabase()
         repo = eager()
         fixtures = DbFixtures()
+    }
+
+    @AfterEach
+    protected fun afterEach() {
+        KoinContext.stopKoin()
+    }
+
+    protected fun queryTest(testFn: suspend () -> Unit) = runBlocking {
+        val connection = hikari.connection
+        val tx = TransactionContext(connection)
         try {
-            runBlocking {
-                val tx = TransactionContext(hikari.connection)
-                try {
-                    withContext(KoinCoroutineInterceptor(koin) + tx) {
-                        testFn()
-                    }
-                } finally {
-                    hikari.evictConnection(tx.connection)
-                }
+            withContext(KoinCoroutineInterceptor(koin) + tx) {
+                testFn()
             }
         } finally {
-            KoinContext.stopKoin()
+            hikari.evictConnection(connection)
         }
     }
 }

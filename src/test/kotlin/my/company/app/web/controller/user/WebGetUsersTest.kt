@@ -33,6 +33,7 @@ class WebGetUsersTest : BaseWebControllerTest(WebGetUsersLocation::class) {
         Mockito.doReturn(mockedActionResponse).`when`(actionMock).execute(capture(actionRequest))
 
         jsonGet {
+            expectNoTransaction()
             expectJsonResponseList(HttpStatusCode.OK, expectedWebResponse)
             assertThat(actionRequest.singleValue).isEqualTo(Unit)
         }

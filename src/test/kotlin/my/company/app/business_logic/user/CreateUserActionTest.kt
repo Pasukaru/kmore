@@ -20,6 +20,7 @@ import my.company.app.test.expectNotBlankValidation
 import my.company.app.test.expectPasswordValidation
 import my.company.app.test.singleValue
 import my.company.jooq.tables.records.UserRecord
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentCaptor
 import org.mockito.Mockito
@@ -29,6 +30,7 @@ class CreateUserActionTest : AbstractActionTest() {
 
     private lateinit var passwordHelper: PasswordHelper
 
+    @BeforeEach
     override fun beforeEach() = super.beforeEach().also {
         passwordHelper = declareMock()
     }

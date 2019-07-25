@@ -119,6 +119,10 @@ abstract class BaseWebControllerTest(
         Mockito.verify(eager<TransactionService>(), times(1)).transaction<Any>(any())
     }
 
+    suspend inline fun expectNoTransaction() {
+        Mockito.verify(eager<TransactionService>(), times(1)).noTransaction<Any>(any())
+    }
+
     inline fun <reified RESPONSE_BODY> TestApplicationCall.jsonResponse(): RESPONSE_BODY = response.jsonResponse()
     inline fun <reified RESPONSE_BODY> TestApplicationResponse.jsonResponse(): RESPONSE_BODY {
         return eager<ObjectMapper>().readValue(content, RESPONSE_BODY::class.java)

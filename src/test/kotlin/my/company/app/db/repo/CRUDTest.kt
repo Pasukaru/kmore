@@ -1,6 +1,6 @@
 package my.company.app.db.repo
 
-abstract class AbstractCRUDTest : AbstractRepositoryTest() {
+abstract class CRUDTest : AbstractRepositoryTest() {
     abstract fun canInsert()
     abstract fun canFindById()
     abstract fun canFindAll()

@@ -43,6 +43,7 @@ class WebCreateUserTest : BaseWebControllerTest(WebCreateUserLocation::class) {
         Mockito.doReturn(mockedResponse).`when`(actionMock).execute(capture(actionRequest))
 
         jsonPost(request) {
+            expectTransaction()
             expectJsonResponse(HttpStatusCode.Created, WebCreateUserResponse(
                 id = mockedResponse.id,
                 email = mockedResponse.email,

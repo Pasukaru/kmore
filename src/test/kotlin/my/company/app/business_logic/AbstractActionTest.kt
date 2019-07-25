@@ -16,6 +16,8 @@ import my.company.app.lib.validation.ValidationService
 import my.company.app.test.AbstractTest
 import my.company.app.test.fixtures.InMemoryFixtures
 import my.company.app.test.mockedContainerModule
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.koin.core.KoinApplication
 import org.koin.dsl.module
 import org.mockito.Mockito
@@ -24,16 +26,19 @@ abstract class AbstractActionTest : AbstractTest() {
 
     open val profile: String = "test"
 
+    lateinit var koin: KoinApplication
     lateinit var repo: Repositories
     lateinit var mockedTimeService: TimeService
     lateinit var validationService: ValidationService
     lateinit var spiedModelGenerator: ModelGenerator
+
     lateinit var mockedAuthorizationService: AuthorizationService
 
     protected val fixtures = InMemoryFixtures
 
-    open fun beforeEach(): KoinApplication {
-        val koin = KoinContext.startKoin {
+    @BeforeEach
+    protected open fun beforeEach() {
+        koin = KoinContext.startKoin {
             modules(listOf(
                 module { single { initConfig(profile) } },
                 module { single { IdGenerator() } },
@@ -50,19 +55,14 @@ abstract class AbstractActionTest : AbstractTest() {
         mockedAuthorizationService = eager()
         repo = eager()
         Mockito.doAnswer { it.arguments.first() }.`when`(validationService).validate<Any>(any())
-        return koin
+    }
+
+    @AfterEach
+    protected open fun afterEach() {
+        KoinContext.stopKoin()
     }
 
     fun actionTest(testFn: suspend () -> Unit) {
-        val koin = beforeEach()
-        try {
-            runBlocking(KoinCoroutineInterceptor(koin)) { testFn() }
-        } finally {
-            afterEach(koin)
-        }
-    }
-
-    open fun afterEach(koin: KoinApplication) {
-        koin.close()
+        runBlocking(KoinCoroutineInterceptor(koin)) { testFn() }
     }
 }

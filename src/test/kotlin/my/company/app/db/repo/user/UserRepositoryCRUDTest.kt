@@ -5,7 +5,7 @@ import assertk.assertions.hasSameSizeAs
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isNull
-import my.company.app.db.repo.AbstractCRUDTest
+import my.company.app.db.repo.CRUDTest
 import my.company.app.lib.Faker
 import my.company.app.test.expectFalse
 import my.company.app.test.expectNotNull
@@ -15,7 +15,7 @@ import my.company.app.test.fixtures.InMemoryFixtures
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
-class UserRepositoryCRUDTest : AbstractCRUDTest() {
+class UserRepositoryCRUDTest : CRUDTest() {
     @Test
     override fun canInsert() = queryTest {
         val expected = InMemoryFixtures.user()

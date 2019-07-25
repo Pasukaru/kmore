@@ -2,13 +2,16 @@ package my.company.app.lib
 
 import com.zaxxer.hikari.pool.HikariPool
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import my.company.app.lib.koin.eager
 
 class TransactionService {
+    private val pool = eager<HikariPool>()
+
     suspend fun <T> transaction(block: suspend CoroutineScope.() -> T): T {
-        val pool = eager<HikariPool>()
-        val tx = TransactionContext(pool.connection)
+        val connection = withContext(Dispatchers.IO) { pool.connection }
+        val tx = TransactionContext(connection)
 
         tx.beginTransaction()
 
@@ -22,19 +25,17 @@ class TransactionService {
             tx.rollback()
             throw e
         } finally {
-            pool.evictConnection(tx.connection)
+            pool.evictConnection(connection)
         }
     }
 
     suspend fun <T> noTransaction(block: suspend CoroutineScope.() -> T): T {
-        val pool = eager<HikariPool>()
-        val tx = TransactionContext(pool.connection)
+        val connection = withContext(Dispatchers.IO) { pool.connection }
+        val tx = TransactionContext(connection)
         try {
             return withContext(tx, block)
-        } catch (e: Throwable) {
-            throw e
         } finally {
-            pool.evictConnection(tx.connection)
+            pool.evictConnection(connection)
         }
     }
 }
