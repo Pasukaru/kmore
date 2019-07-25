@@ -24,7 +24,8 @@ class FlywayFeature {
                 .dataSource(HikariDataSource(HikariCPFeature.config(appConfig)))
         }
 
-        fun flyway(appConfig: AppConfig) = Flyway(config(appConfig))
+        fun flyway(config: FluentConfiguration) = Flyway(config)
+        fun flyway(appConfig: AppConfig) = flyway(config(appConfig))
 
         override fun install(pipeline: Application, configure: Unit.() -> Unit): FlywayFeature {
             logger.debug("Installing HikariCPFeature")
@@ -33,7 +34,7 @@ class FlywayFeature {
             val appConfig = eager<AppConfig>()
 
             if (appConfig.flyway.enabled) {
-                val flyway = flyway(eager())
+                val flyway = flyway(appConfig)
                 flyway.migrate()
             }
 

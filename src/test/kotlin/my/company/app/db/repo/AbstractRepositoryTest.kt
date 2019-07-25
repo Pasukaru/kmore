@@ -37,7 +37,7 @@ abstract class AbstractRepositoryTest : AbstractTest() {
 
     protected fun resetDatabase() {
         val con = hikari.connection
-        con.prepareStatement("DROP SCHEMA public CASCADE").execute()
+        con.prepareStatement("DROP SCHEMA IF EXISTS public CASCADE").execute()
         flyway.migrate()
         hikari.evictConnection(con)
     }
