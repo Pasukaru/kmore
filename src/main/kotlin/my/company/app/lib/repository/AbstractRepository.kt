@@ -1,6 +1,8 @@
 package my.company.app.lib.repository
 
+import my.company.app.lib.TimeService
 import my.company.app.lib.jooq.withConnection
+import my.company.app.lib.koin.lazy
 import my.company.app.lib.logger
 import org.jooq.DSLContext
 import org.jooq.Field
@@ -15,6 +17,7 @@ abstract class AbstractRepository<ID, TABLE : Table<RECORD>, RECORD : Record>(
 ) : Repository {
 
     protected val logger = this::class.logger()
+    protected val timeService by lazy<TimeService>()
 
     @Suppress("UNCHECKED_CAST")
     protected val table: TABLE = table.`as`(table.unqualifiedName) as TABLE
@@ -29,7 +32,11 @@ abstract class AbstractRepository<ID, TABLE : Table<RECORD>, RECORD : Record>(
     open suspend fun findById(id: ID): RECORD? = dsl.select().from(table).where(primaryKey.eq(id)).withConnection().fetchOne()?.into(table)
     open suspend fun findAll(): List<RECORD> = dsl.select().from(table).withConnection().fetch().into(table)
 
+    open fun beforeInsert(record: RECORD) {}
+    open fun beforeUpdate(record: RECORD) {}
+
     open suspend fun insert(record: RECORD): RECORD {
+        beforeInsert(record)
         val rows = dsl.insertInto(table).set(record).withConnection().execute()
         if (rows != 1) throw SQLDataException("Failed to insert row")
         record.changed(false)
@@ -40,6 +47,7 @@ abstract class AbstractRepository<ID, TABLE : Table<RECORD>, RECORD : Record>(
     protected open val RECORD.id : ID get() = this["id"] as ID
 
     open suspend fun update(record: RECORD): RECORD {
+        beforeUpdate(record)
         val rows = dsl.update(table).set(record).where(primaryKey.eq(record.id)).withConnection().execute()
         if (rows != 1) throw SQLDataException("Failed to update row")
         record.changed(false)

@@ -13,14 +13,20 @@ import my.company.app.test.expectNull
 import my.company.app.test.expectTrue
 import my.company.app.test.fixtures.InMemoryFixtures
 import org.junit.jupiter.api.Test
+import java.time.Instant
 import java.util.UUID
 
 class UserRepositoryCRUDTest : CRUDTest() {
     @Test
     override fun canInsert() = queryTest {
-        val expected = InMemoryFixtures.user()
+        val expected = InMemoryFixtures.user(
+            createdAt = mockedTimeService.now()
+        )
 
-        val created = repo.user.insert(expected.copy().also { it.id = expected.id })
+        val created = repo.user.insert(expected.copy().also {
+            it.id = expected.id
+            it.createdAt = Instant.now().minusSeconds(1000)
+        })
         assertThat(created).isEqualTo(expected)
         assertThat(created.changed()).isFalse()
     }
@@ -53,11 +59,11 @@ class UserRepositoryCRUDTest : CRUDTest() {
         val existing = fixtures.user()
         val expected = InMemoryFixtures.user().also {
             it.id = existing.id
+            it.updatedAt = mockedTimeService.now()
             it.changed(false)
         }
 
         val updated = repo.user.update(expected.copy().also { it.id = existing.id })
-        assertThat(updated).isEqualTo(expected)
         assertThat(updated).isEqualTo(expected)
         assertThat(repo.user.findById(existing.id)).isEqualTo(expected)
     }

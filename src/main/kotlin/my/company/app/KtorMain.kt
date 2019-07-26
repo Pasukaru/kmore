@@ -88,13 +88,12 @@ class KtorMain {
 }
 
 fun initConfig(profile: String? = null): AppConfig {
+    TimeZone.setDefault(TimeZone.getTimeZone(ZoneOffset.UTC))
     appConfig = AppConfigLoader.loadProfile(profile)
     return appConfig
 }
 
 fun Application.mainModule() {
-    TimeZone.setDefault(TimeZone.getTimeZone(ZoneOffset.UTC))
-
     install(CallLogging)
     install(Locations)
 

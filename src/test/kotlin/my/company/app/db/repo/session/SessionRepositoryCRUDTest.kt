@@ -10,15 +10,19 @@ import my.company.app.test.expectNotNull
 import my.company.app.test.expectNull
 import my.company.app.test.fixtures.InMemoryFixtures
 import org.junit.jupiter.api.Test
+import java.time.Instant
 import java.util.UUID
 
 class SessionRepositoryCRUDTest : CRUDTest() {
     @Test
     override fun canInsert() = queryTest {
         val user = fixtures.user()
-        val expected = InMemoryFixtures.session(userId = user.id)
+        val expected = InMemoryFixtures.session(userId = user.id, createdAt = mockedTimeService.now())
 
-        val created = repo.session.insert(expected.copy().also { it.id = expected.id })
+        val created = repo.session.insert(expected.copy().also {
+            it.id = expected.id
+            it.createdAt = Instant.now().minusSeconds(1000)
+        })
         assertThat(created).isEqualTo(expected)
         assertThat(created.changed()).isFalse()
     }
@@ -26,7 +30,7 @@ class SessionRepositoryCRUDTest : CRUDTest() {
     @Test
     override fun canFindById() = queryTest {
         val user = fixtures.user()
-        val existing = fixtures.session(userId = user.id)
+        val existing = fixtures.session(userId = user.id, createdAt = mockedTimeService.now())
 
         val found = repo.session.findById(existing.id).expectNotNull()
         assertThat(found).isEqualTo(existing)
@@ -53,13 +57,15 @@ class SessionRepositoryCRUDTest : CRUDTest() {
         val user = fixtures.user()
         val user2 = fixtures.user()
         val existing = fixtures.session(userId = user.id)
-        val expected = InMemoryFixtures.session(userId = user2.id).also {
+        val expected = InMemoryFixtures.session(
+            userId = user2.id
+        ).also {
             it.id = existing.id
+            it.updatedAt = mockedTimeService.now()
             it.changed(false)
         }
 
         val updated = repo.session.update(expected.copy().also { it.id = existing.id })
-        assertThat(updated).isEqualTo(expected)
         assertThat(updated).isEqualTo(expected)
         assertThat(repo.session.findById(existing.id)).isEqualTo(expected)
     }

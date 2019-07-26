@@ -2,7 +2,9 @@ package my.company.app.db.repo
 
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import my.company.app.MockedTimeService
 import my.company.app.initConfig
+import my.company.app.lib.TimeService
 import my.company.app.lib.TransactionContext
 import my.company.app.lib.koin.KoinContext
 import my.company.app.lib.koin.KoinCoroutineInterceptor
@@ -18,6 +20,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.parallel.ResourceLock
 import org.koin.core.KoinApplication
+import org.koin.dsl.module
 
 @Tag("Repository")
 @ResourceLock("Database")
@@ -34,6 +37,7 @@ abstract class AbstractRepositoryTest : AbstractTest() {
 
     lateinit var repo: Repositories
     lateinit var fixtures: DbFixtures
+    lateinit var mockedTimeService: TimeService
 
     protected fun resetDatabase() {
         val con = hikari.connection
@@ -48,12 +52,14 @@ abstract class AbstractRepositoryTest : AbstractTest() {
     protected fun beforeEach() {
         koin = KoinContext.startKoin {
             modules(listOf(
+                module { single { MockedTimeService.mock } },
                 containerModule<Repositories>()
             ))
         }
-        resetDatabase()
         repo = eager()
         fixtures = DbFixtures()
+        mockedTimeService = eager()
+        resetDatabase()
     }
 
     @AfterEach

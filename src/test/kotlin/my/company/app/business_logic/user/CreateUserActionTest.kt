@@ -55,7 +55,11 @@ class CreateUserActionTest : AbstractActionTest() {
 
         Mockito.doReturn(false).`when`(repo.user).existsByEmailIgnoringCase(request.email)
         Mockito.doReturn(hashedPassword).`when`(passwordHelper).hashPassword(any())
-        Mockito.doAnswer { it.arguments.first() }.`when`(repo.user).insert(capture(createdUser))
+        Mockito.doAnswer {
+            val user = it.arguments.first() as UserRecord
+            user.createdAt = mockedTimeService.now()
+            user
+        }.`when`(repo.user).insert(capture(createdUser))
 
         return Context(
             request = request,

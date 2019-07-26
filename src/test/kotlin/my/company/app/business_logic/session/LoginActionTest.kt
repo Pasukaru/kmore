@@ -45,7 +45,11 @@ class LoginActionTest : AbstractActionTest() {
 
         Mockito.doReturn(mockedUser).`when`(repo.user).findByEmailIgnoringCase(any())
         Mockito.doReturn(true).`when`(passwordHelper).checkPassword(any(), any())
-        Mockito.doAnswer { it.arguments.first() }.`when`(repo.session).insert(capture(createdSession))
+        Mockito.doAnswer {
+            val session = it.arguments.first() as SessionRecord
+            session.createdAt = mockedTimeService.now()
+            session
+        }.`when`(repo.session).insert(capture(createdSession))
 
         return Context(
             request = LoginRequest(mockedUser.email, mockedUser.password),
