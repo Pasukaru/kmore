@@ -48,3 +48,4 @@ Any test that does not support concurrency (i.e: postgres integration tests) nee
 ## TODOs
 
 * Parse query parameters as data classes
+* Queries with custom result set that will be converted to data classes 
