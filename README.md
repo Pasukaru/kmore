@@ -43,7 +43,7 @@ To manually run detekt execute `./scripts/detekt.sh`
 ## Tests
 
 Tests are setup to run concurrently by default.
-Any test that does not support concurrency (i.e: postgres integration tests) need to be annotated with `@Execution(ExecutionMode.SAME_THREAD)`
+Any test that does not support concurrency (i.e: postgres integration tests) need to be annotated with `@ResourceLock(<resource>)`
 
 ## TODOs
 
