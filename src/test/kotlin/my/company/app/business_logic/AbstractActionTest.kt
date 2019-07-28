@@ -1,6 +1,7 @@
 package my.company.app.business_logic
 
 import com.nhaarman.mockitokotlin2.any
+import dev.fixtures.InMemoryFixtures
 import kotlinx.coroutines.runBlocking
 import my.company.app.MockedTimeService
 import my.company.app.db.ModelGenerator
@@ -14,7 +15,6 @@ import my.company.app.lib.koin.eager
 import my.company.app.lib.repository.Repositories
 import my.company.app.lib.validation.ValidationService
 import my.company.app.test.AbstractTest
-import my.company.app.test.fixtures.InMemoryFixtures
 import my.company.app.test.mockedContainerModule
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach

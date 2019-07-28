@@ -8,21 +8,18 @@ class AppConfig(
     val profile: String?,
     private val config: Config
 ) {
-    val ktorPort = config.getInt("ktor.port")
+    companion object {
+        private const val KTOR_ENVIRONMENT = "ktor.environment"
+    }
+
+    val ktorPort = config.getInt("ktor.deployment.port")
 
     val swaggerPassword: String = config.getString("swagger.password")
 
-    val isDev: Boolean = config.getString("ktor.environment") == "dev"
-    val isTest: Boolean = config.getString("ktor.environment") == "test"
-    val isProd: Boolean = !isDev && !isTest
-
-    val logLevels by lazy {
-        val map = mutableMapOf<String, String>()
-        config
-            .getObject("logging")
-            .forEach { key, value -> resolveLogLevel(map, key, value) }
-        map.toSortedMap() as Map<String, String>
-    }
+    val isDev: Boolean = config.getString(KTOR_ENVIRONMENT) == "dev"
+    val isTest: Boolean = config.getString(KTOR_ENVIRONMENT) == "test"
+    val isLoadFixtures: Boolean = config.getString(KTOR_ENVIRONMENT) == "load-fixtures"
+    val isProd: Boolean = !isDev && !isTest && !isLoadFixtures
 
     val database = Database()
 
@@ -44,7 +41,17 @@ class AppConfig(
         val enabled: Boolean = config.getBoolean("flyway.enabled")
     }
 
-    fun resolveLogLevel(map: MutableMap<String, String>, logger: String, value: Any) {
+    val logLevels = parseLogLevels(config)
+
+    private fun parseLogLevels(config: Config): Map<String, String> {
+        val map = mutableMapOf<String, String>()
+        config
+            .getObject("logging")
+            .forEach { key, value -> resolveLogLevel(map, key, value) }
+        return map.toSortedMap()
+    }
+
+    private fun resolveLogLevel(map: MutableMap<String, String>, logger: String, value: Any) {
         when (value) {
             is String -> map[logger] = value
             is Map<*, *> -> value.forEach { (key, value) ->

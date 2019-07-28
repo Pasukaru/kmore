@@ -5,10 +5,10 @@ import assertk.assertions.hasSameSizeAs
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isNull
+import dev.fixtures.InMemoryFixtures
 import my.company.app.db.repo.CRUDTest
 import my.company.app.test.expectNotNull
 import my.company.app.test.expectNull
-import my.company.app.test.fixtures.InMemoryFixtures
 import org.junit.jupiter.api.Test
 import java.time.Instant
 import java.util.UUID

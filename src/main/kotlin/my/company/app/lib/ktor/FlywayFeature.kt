@@ -13,7 +13,7 @@ import org.flywaydb.core.api.configuration.FluentConfiguration
 class FlywayFeature {
     companion object Feature : ApplicationFeature<Application, Unit, FlywayFeature> {
         private val logger = logger<FlywayFeature>()
-        private val KEY = AttributeKey<FlywayFeature>("HikariCPFeature")
+        private val KEY = AttributeKey<FlywayFeature>("FlywayFeature")
         override val key: AttributeKey<FlywayFeature> get() = KEY
 
         fun config(appConfig: AppConfig): FluentConfiguration {

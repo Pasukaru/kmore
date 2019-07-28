@@ -4,7 +4,6 @@
 
 * Dependency Injection (Koin)
 * Database connection pooling (Hikari)
-    * TODO: Configurable data source
 * (basic) Transaction management
     * TODO: More control  
 * Database migrations (Flyway)
@@ -15,6 +14,8 @@
 * Authentication (via token in custom header `X-Auth-Token`)
 * Authorization
 * Parallel test execution
+* `dev` package that's excluded from the built jar to avoid dangerous code on live systems. 
+    It contains for example the fixture loader that drops the schema before inserting it's data.
 
 ## How to run: 
 
@@ -46,5 +47,4 @@ Any test that does not support concurrency (i.e: postgres integration tests) nee
 
 ## TODOs
 
-* Fixtures (To be loaded when the `load-fixtures` profile is active)
-* Database hooks? (automated `created_at`, `updated_at`, etc?)
+* Parse query parameters as data classes

@@ -1,6 +1,7 @@
-package my.company.app.test.fixtures
+package dev.fixtures
 
-import my.company.app.test.fixtures.RecordFixtures.Companion.SECURE_RANDOM
+import dev.fixtures.RecordFixtures.Companion.MIN_CRYPTO_LOG_ROUNDS
+import dev.fixtures.RecordFixtures.Companion.SECURE_RANDOM
 import my.company.jooq.tables.records.SessionRecord
 import my.company.jooq.tables.records.UserRecord
 import org.jooq.Record
@@ -30,7 +31,7 @@ object InMemoryFixtures : RecordFixtures {
             it.email = email
             it.firstName = firstName
             it.lastName = lastName
-            it.password = BCrypt.hashpw(passwordClean, BCrypt.gensalt(4, SECURE_RANDOM))
+            it.password = BCrypt.hashpw(passwordClean, BCrypt.gensalt(MIN_CRYPTO_LOG_ROUNDS, SECURE_RANDOM))
             it.createdAt = createdAt
             it.updatedAt = updatedAt
         })

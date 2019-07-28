@@ -1,5 +1,6 @@
-package my.company.app.test.fixtures
+package dev.fixtures
 
+import dev.fixtures.RecordFixtures.Companion.MIN_CRYPTO_LOG_ROUNDS
 import my.company.app.lib.koin.lazy
 import my.company.app.lib.repository.Repositories
 import my.company.jooq.tables.records.SessionRecord
@@ -26,7 +27,7 @@ class DbFixtures : RecordFixtures {
             it.email = email
             it.firstName = firstName
             it.lastName = lastName
-            it.password = BCrypt.hashpw(passwordClean, BCrypt.gensalt(4, RecordFixtures.SECURE_RANDOM))
+            it.password = BCrypt.hashpw(passwordClean, BCrypt.gensalt(MIN_CRYPTO_LOG_ROUNDS, RecordFixtures.SECURE_RANDOM))
             it.createdAt = createdAt
             it.updatedAt = updatedAt
         })

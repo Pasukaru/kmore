@@ -4,6 +4,7 @@ package my.company.app
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
+import dev.fixtures.LoadFixturesFeature
 import io.ktor.application.Application
 import io.ktor.application.install
 import io.ktor.features.CallLogging
@@ -89,6 +90,7 @@ class KtorMain {
 
 fun initConfig(profile: String? = null): AppConfig {
     TimeZone.setDefault(TimeZone.getTimeZone(ZoneOffset.UTC))
+    System.setProperty("org.jooq.no-logo", "true")
     appConfig = AppConfigLoader.loadProfile(profile)
     return appConfig
 }
@@ -163,7 +165,11 @@ fun Application.mainModule() {
         }
     }
 
-    if (!appConfig.isDev && !appConfig.isTest) {
+    if (!appConfig.isProd && appConfig.isLoadFixtures) {
+        install(LoadFixturesFeature)
+    }
+
+    if (appConfig.isProd) {
         install(ApplicationWarmup)
     }
 

@@ -1,3 +1,3 @@
 package my.company.app
 
-class PackageNoOp
+class PackageNoOp private constructor()

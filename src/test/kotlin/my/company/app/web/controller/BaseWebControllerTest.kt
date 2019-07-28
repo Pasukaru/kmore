@@ -5,6 +5,7 @@ import assertk.assertions.isEqualTo
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.times
+import dev.fixtures.InMemoryFixtures
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCallPipeline
 import io.ktor.http.ContentType
@@ -33,7 +34,6 @@ import my.company.app.lib.validation.ValidationService
 import my.company.app.mainModule
 import my.company.app.test.AbstractTest
 import my.company.app.test.declareMock
-import my.company.app.test.fixtures.InMemoryFixtures
 import my.company.app.web.ErrorResponse
 import my.company.app.web.getPathFromLocation
 import org.mockito.Mockito

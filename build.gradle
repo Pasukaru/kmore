@@ -59,8 +59,8 @@ dependencies {
     compile group: 'io.ktor', name: 'ktor-server-core', version: ktorVersion
     compile group: 'io.ktor', name: 'ktor-server-netty', version: ktorVersion
     compile group: 'io.ktor', name: 'ktor-websockets', version: ktorVersion
-    implementation group: 'io.ktor', name: 'ktor-jackson', version: ktorVersion
-    implementation group: 'io.ktor', name: 'ktor-locations', version: ktorVersion
+    compile group: 'io.ktor', name: 'ktor-jackson', version: ktorVersion
+    compile group: 'io.ktor', name: 'ktor-locations', version: ktorVersion
     compile group: 'org.koin', name: 'koin-core', version: koinVersion
 
     compile group: 'org.postgresql', name: 'postgresql', version: postgresDriverVersion
@@ -129,6 +129,18 @@ task run(type: JavaExec) {
     dependsOn(build)
     classpath sourceSets.main.runtimeClasspath
     main = "MainKt"
+}
+
+jar {
+    manifest {
+        attributes "Main-Class": "my.company.app.KtorMainKt"
+    }
+    // Fat Jar
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+        configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    exclude("dev/**")
 }
 
 println("Checking for pre-commit installation")

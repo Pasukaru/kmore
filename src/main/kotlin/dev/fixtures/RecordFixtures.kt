@@ -1,4 +1,4 @@
-package my.company.app.test.fixtures
+package dev.fixtures
 
 import my.company.app.lib.Faker
 import my.company.jooq.tables.records.SessionRecord
@@ -7,8 +7,10 @@ import java.security.SecureRandom
 import java.time.Instant
 import java.util.UUID
 
+@Suppress("LongParameterList")
 interface RecordFixtures {
     companion object Companion {
+        const val MIN_CRYPTO_LOG_ROUNDS = 4
         val SECURE_RANDOM = SecureRandom()
     }
 

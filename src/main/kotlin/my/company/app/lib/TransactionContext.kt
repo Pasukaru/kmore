@@ -31,7 +31,7 @@ class TransactionContext(
 
     suspend fun beginTransaction() {
         execute {
-            logger.trace("$this: BEGIN TRANSACTION")
+            logger.debug("${this@TransactionContext}: BEGIN TRANSACTION")
             DSL.using(connection).execute("BEGIN TRANSACTION")
         }
     }
@@ -39,7 +39,7 @@ class TransactionContext(
     suspend fun commit() {
         beforeCommitHooks.forEach { it.invoke() }
         execute {
-            logger.trace("$this: COMMIT")
+            logger.debug("${this@TransactionContext}: COMMIT")
             DSL.using(connection).execute("COMMIT")
             committed = true
         }
@@ -49,7 +49,7 @@ class TransactionContext(
 
     suspend fun rollback() {
         execute {
-            logger.trace("$this: ROLLBACK")
+            logger.debug("${this@TransactionContext}: ROLLBACK")
             DSL.using(connection).execute("ROLLBACK")
             rolledBack = true
         }
@@ -58,13 +58,19 @@ class TransactionContext(
     }
 
     private fun expectActive() {
-        if (committed || rolledBack) throw IllegalStateException("Transaction is already completed")
+        if (committed || rolledBack) error("Transaction is already completed")
     }
 
     suspend fun <T> execute(op: Connection.() -> T): T = withContext(Dispatchers.IO) {
-        synchronized(connection) {
-            expectActive()
-            op(connection)
+        logger.trace("${this@TransactionContext}: Waiting for lock")
+        try {
+            synchronized(connection) {
+                logger.trace("${this@TransactionContext}: Acquired lock")
+                expectActive()
+                op(connection)
+            }
+        } finally {
+            logger.trace("${this@TransactionContext}: Released lock")
         }
     }
 
