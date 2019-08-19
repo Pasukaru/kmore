@@ -20,12 +20,13 @@ class WebUserController : AbstractWebController(
 
     override val routing: Routing.() -> Unit = {
         documentedPost<WebCreateUserLocation>({ req<WebCreateUserRequest>().res<WebCreateUserResponse>() }) {
-            val req = mapper.req(validate(call.receive()))
+            val req = mapper.req(validate(call.receive<WebCreateUserRequest>()))
             val res = mapper.res(transaction { userActions.createUser.execute(req) })
             call.respond(HttpStatusCode.Created, res)
         }
-        documentedGet<WebGetUsersLocation>({ resList<WebGetUsersResponse>() }) {
-            val res = mapper.res(noTransaction { userActions.getUsers.execute(Unit) })
+        documentedGet<WebGetUsersLocation>({ resList<WebGetUsersResponse>().query<WebGetUsersRequestQuery>() }) {
+            val query = parameterParser.parse<WebGetUsersRequestQuery>(call.parameters)
+            val res = mapper.res(noTransaction { userActions.getUsers.execute(mapper.req(query)) })
             call.respond(HttpStatusCode.OK, res)
         }
     }

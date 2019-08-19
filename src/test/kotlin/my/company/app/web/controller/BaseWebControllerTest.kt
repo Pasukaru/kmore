@@ -29,6 +29,7 @@ import my.company.app.initConfig
 import my.company.app.lib.TransactionService
 import my.company.app.lib.koin.KoinCoroutineInterceptor
 import my.company.app.lib.koin.eager
+import my.company.app.lib.ktor.ParameterParser
 import my.company.app.lib.ktor.getKoin
 import my.company.app.lib.validation.ValidationService
 import my.company.app.mainModule
@@ -45,6 +46,7 @@ abstract class BaseWebControllerTest(
 ) : AbstractTest() {
 
     protected val fixtures = InMemoryFixtures
+    protected lateinit var parameterParser: ParameterParser
 
     protected inline fun TestApplicationEngine.jsonPost(body: Any, crossinline setup: TestApplicationRequest.() -> Unit = {}, testFn: TestApplicationCall.() -> Unit = {}) {
         with(handleRequest(HttpMethod.Post, url) {
@@ -58,8 +60,9 @@ abstract class BaseWebControllerTest(
         }
     }
 
-    protected inline fun TestApplicationEngine.jsonGet(crossinline setup: TestApplicationRequest.() -> Unit = {}, testFn: TestApplicationCall.() -> Unit = {}) {
-        with(handleRequest(HttpMethod.Get, url) {
+    protected inline fun TestApplicationEngine.jsonGet(query: String = "", crossinline setup: TestApplicationRequest.() -> Unit = {}, testFn: TestApplicationCall.() -> Unit = {}) {
+        val requestUrl = url + query
+        with(handleRequest(HttpMethod.Get, requestUrl) {
             setup()
         }) {
             testFn()
@@ -105,6 +108,7 @@ abstract class BaseWebControllerTest(
         initConfig(profile)
         withTestApplication(Application::mainModule) {
             val koin = this.application.getKoin()
+            parameterParser = eager()
             runBlocking(KoinCoroutineInterceptor(koin)) {
                 application.routing {
                     skipInterceptors()

@@ -1,18 +1,14 @@
 package my.company.app.lib.swagger
 
-import com.fasterxml.classmate.TypeResolver
 import com.google.common.collect.ArrayListMultimap
 import io.ktor.http.ContentType
 import io.swagger.models.Contact
 import io.swagger.models.Info
 import io.swagger.models.License
+import my.company.app.lib.swagger.SwaggerHelper.toModel
 import org.springframework.http.HttpMethod
 import springfox.documentation.builders.DocumentationBuilder
-import springfox.documentation.builders.ModelBuilder
-import springfox.documentation.builders.ModelPropertyBuilder
 import springfox.documentation.schema.Model
-import springfox.documentation.schema.ModelProperty
-import springfox.documentation.schema.ModelRef
 import springfox.documentation.service.ApiDescription
 import springfox.documentation.service.ApiListing
 import springfox.documentation.service.Documentation
@@ -26,51 +22,7 @@ import springfox.documentation.swagger2.mappers.SecurityMapperImpl
 import springfox.documentation.swagger2.mappers.ServiceModelToSwagger2Mapper
 import springfox.documentation.swagger2.mappers.ServiceModelToSwagger2MapperImpl
 import springfox.documentation.swagger2.mappers.VendorExtensionsMapperImpl
-import java.util.UUID
 import kotlin.reflect.KClass
-import kotlin.reflect.KProperty
-import kotlin.reflect.full.declaredMemberProperties
-
-fun toModel(model: KClass<*>): Model {
-    val builder = ModelBuilder()
-        .name(model.simpleName)
-        .type(typeResolver.resolve(model.java))
-
-    val props = model.declaredMemberProperties
-        .associateTo(mutableMapOf()) { it.name to toModelProperty(it) }
-
-    builder.properties(props)
-
-    return builder.build()
-}
-
-fun toModelProperty(prop: KProperty<*>): ModelProperty {
-    val type = prop.returnType
-    val kClazz = (type.classifier as KClass<*>)
-    val clazz = kClazz.java
-
-    val property = ModelPropertyBuilder()
-        .type(typeResolver.resolve(clazz))
-        .required(!type.isMarkedNullable)
-        .isHidden(false)
-        .name(prop.name)
-        .qualifiedType(clazz.canonicalName)
-        .readOnly(false)
-        .description("Description for ${prop.name}")
-        .build()
-
-    property.updateModelRef { _ ->
-        when (kClazz) {
-            String::class -> ModelRef("string")
-            UUID::class -> ModelRef("uuid")
-            else -> throw IllegalStateException("Unsupported property: $clazz - $prop")
-        }
-    }
-
-    return property
-}
-
-val typeResolver = TypeResolver()
 
 data class OperationContext(
     val method: HttpMethod,

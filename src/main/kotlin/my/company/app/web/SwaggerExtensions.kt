@@ -6,6 +6,7 @@ import io.ktor.http.HttpStatusCode
 import my.company.app.lib.koin.lazy
 import my.company.app.lib.swagger.OperationContext
 import my.company.app.lib.swagger.SwaggerConfiguration
+import my.company.app.lib.swagger.SwaggerHelper
 import org.springframework.http.HttpMethod
 import springfox.documentation.schema.ModelRef
 import springfox.documentation.service.ApiDescription
@@ -95,6 +96,36 @@ abstract class AbstractOperationBuilder<SELF : AbstractOperationBuilder<SELF>> :
             ArrayListMultimap.create(),
             mutableListOf()
         )
+
+        return self
+    }
+
+    inline fun <reified T : Any> query() = query(T::class)
+    fun query(type: KClass<*>): SELF {
+        val model = SwaggerHelper.toModel(type)
+
+        model.properties.forEach { (_, property) ->
+            parameters += Parameter(
+                property.name,
+                property.description,
+                property.defaultValue,
+                property.isRequired,
+                false,
+                property.isAllowEmptyValue,
+                property.modelRef,
+                Optional.of(property.type),
+                property.allowableValues,
+                "query",
+                "",
+                property.isHidden,
+                property.pattern,
+                null,
+                0,
+                property.example,
+                ArrayListMultimap.create(),
+                property.vendorExtensions
+            )
+        }
 
         return self
     }

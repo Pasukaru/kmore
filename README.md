@@ -10,6 +10,7 @@
 * Query Building & Execution (JOOQ, codegen from database migrations) 
 * DTO validation (Hibernate validator)
 * API Documentation (Swagger, protected by BasicAuth and a configurable password)
+* Parse query parameters as data classes
 * Global error handling
 * Authentication (via token in custom header `X-Auth-Token`)
 * Authorization
@@ -47,5 +48,4 @@ Any test that does not support concurrency (i.e: postgres integration tests) nee
 
 ## TODOs
 
-* Parse query parameters as data classes
 * Queries with custom result set that will be converted to data classes 

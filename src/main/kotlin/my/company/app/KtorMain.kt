@@ -33,6 +33,7 @@ import my.company.app.lib.koin.withKoin
 import my.company.app.lib.ktor.ApplicationWarmup
 import my.company.app.lib.ktor.HikariCPFeature
 import my.company.app.lib.ktor.KoinFeature
+import my.company.app.lib.ktor.ParameterParser
 import my.company.app.lib.ktor.StartupLog
 import my.company.app.lib.ktor.getKoin
 import my.company.app.lib.ktor.uuidConverter
@@ -124,6 +125,7 @@ fun Application.mainModule() {
                     single { AuthorizationService() }
                     single { GlobalWebErrorHandler() }
                     single { PasswordHelper() }
+                    single { ParameterParser() }
                     val validationFactory = Validation.buildDefaultValidatorFactory()!!
                     single { validationFactory }
                     single { validationFactory.validator }

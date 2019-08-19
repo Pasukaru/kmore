@@ -1,6 +1,7 @@
 package my.company.app.web.controller.user
 
 import my.company.app.business_logic.user.CreateUserRequest
+import my.company.app.business_logic.user.GetUsersFilter
 import my.company.jooq.tables.records.UserRecord
 
 class WebUserMapper {
@@ -17,6 +18,12 @@ class WebUserMapper {
         email = response.email,
         firstName = response.firstName,
         lastName = response.lastName
+    )
+
+    fun req(query: WebGetUsersRequestQuery) = GetUsersFilter(
+        email = query.email,
+        name = query.name,
+        createdAtBefore = query.createdAtBefore
     )
 
     fun res(response: List<UserRecord>) = response.map { user ->

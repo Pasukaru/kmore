@@ -3,7 +3,6 @@ package my.company.app.db.repo
 import dev.fixtures.DbFixtures
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import my.company.app.MockedTimeService
 import my.company.app.initConfig
 import my.company.app.lib.TimeService
 import my.company.app.lib.TransactionContext
@@ -15,6 +14,7 @@ import my.company.app.lib.ktor.FlywayFeature
 import my.company.app.lib.ktor.HikariCPFeature
 import my.company.app.lib.repository.Repositories
 import my.company.app.test.AbstractTest
+import my.company.app.test.MockedTimeService
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Tag

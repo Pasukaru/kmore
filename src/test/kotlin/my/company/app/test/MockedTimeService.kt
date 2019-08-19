@@ -1,4 +1,4 @@
-package my.company.app
+package my.company.app.test
 
 import my.company.app.lib.TimeService
 import org.mockito.Mockito

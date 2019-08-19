@@ -30,6 +30,11 @@ import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.jvm.javaField
 
+fun <T> Collection<T>.expectOne(): T {
+    assertThat(size).isEqualTo(1)
+    return first()
+}
+
 fun HttpStatusCode?.expectCreated() = assertThat(this).isEqualTo(HttpStatusCode.Created)
 fun HttpStatusCode?.expectOK() = assertThat(this).isEqualTo(HttpStatusCode.OK)
 
