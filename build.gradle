@@ -34,7 +34,7 @@ buildscript {
     }
 }
 
-group 'ktor-server-scaffolding'
+group 'kmore'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'kotlin'
