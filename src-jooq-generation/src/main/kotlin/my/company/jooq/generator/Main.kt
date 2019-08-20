@@ -1,4 +1,4 @@
-package my.company
+package my.company.jooq.generator
 
 import org.flywaydb.core.Flyway
 import org.jooq.codegen.GenerationTool
@@ -7,7 +7,9 @@ import org.jooq.meta.jaxb.Configuration
 import java.io.File
 import java.io.FileInputStream
 
-class JooqCodeGenerator {
+fun main() = Main.generateClasses()
+
+object Main {
     fun generateClasses() {
         println("GenerateJooqClasses WORKING_DIR: " + File("").absolutePath)
         val dbPlaceholder = "{DATABASE}"
@@ -65,8 +67,4 @@ class JooqCodeGenerator {
         )
         flyway.migrate()
     }
-}
-
-fun main() {
-    JooqCodeGenerator().generateClasses()
 }

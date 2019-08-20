@@ -23,10 +23,10 @@ import my.company.app.conf.AppConfigLoader
 import my.company.app.conf.AppConfigLoader.initLogging
 import my.company.app.db.ModelGenerator
 import my.company.app.lib.AuthorizationService
+import my.company.app.lib.DatabaseService
 import my.company.app.lib.IdGenerator
 import my.company.app.lib.PasswordHelper
 import my.company.app.lib.TimeService
-import my.company.app.lib.TransactionService
 import my.company.app.lib.koin.containerModule
 import my.company.app.lib.koin.eager
 import my.company.app.lib.koin.withKoin
@@ -130,7 +130,7 @@ fun Application.mainModule() {
                     single { validationFactory }
                     single { validationFactory.validator }
                     single { ValidationService() }
-                    single { TransactionService() }
+                    single { DatabaseService() }
                 },
                 containerModule<Repositories>(),
                 containerModule<SessionActions>(),

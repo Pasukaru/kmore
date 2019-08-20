@@ -4,19 +4,17 @@
 package my.company.jooq.tables.records;
 
 
-import java.time.Instant;
-import java.util.UUID;
-
-import javax.annotation.Generated;
-import org.jetbrains.annotations.NotNull;
-
 import my.company.jooq.tables.User;
-
+import org.jetbrains.annotations.NotNull;
 import org.jooq.Field;
 import org.jooq.Record1;
 import org.jooq.Record7;
 import org.jooq.Row7;
 import org.jooq.impl.UpdatableRecordImpl;
+
+import javax.annotation.Generated;
+import java.time.Instant;
+import java.util.UUID;
 
 
 /**
@@ -32,7 +30,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class UserRecord extends UpdatableRecordImpl<UserRecord> implements Record7<UUID, String, String, String, String, Instant, Instant> {
 
-    private static final long serialVersionUID = 726577913;
+    private static final long serialVersionUID = 1124500086;
 
     /**
      * Setter for <code>public.user.id</code>.
@@ -440,5 +438,14 @@ public class UserRecord extends UpdatableRecordImpl<UserRecord> implements Recor
         set(4, password);
         set(5, createdAt);
         set(6, updatedAt);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("User(");
+        for (Field<?> f : fields()) {
+            sb.append(" [").append(f.getName()).append("=").append(this.get(f)).append("]");
+        }
+        return sb.append(" )").toString();
     }
 }

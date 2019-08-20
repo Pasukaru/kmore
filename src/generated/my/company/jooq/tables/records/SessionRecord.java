@@ -4,19 +4,17 @@
 package my.company.jooq.tables.records;
 
 
-import java.time.Instant;
-import java.util.UUID;
-
-import javax.annotation.Generated;
-import org.jetbrains.annotations.NotNull;
-
 import my.company.jooq.tables.Session;
-
+import org.jetbrains.annotations.NotNull;
 import org.jooq.Field;
 import org.jooq.Record1;
 import org.jooq.Record4;
 import org.jooq.Row4;
 import org.jooq.impl.UpdatableRecordImpl;
+
+import javax.annotation.Generated;
+import java.time.Instant;
+import java.util.UUID;
 
 
 /**
@@ -32,7 +30,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class SessionRecord extends UpdatableRecordImpl<SessionRecord> implements Record4<UUID, UUID, Instant, Instant> {
 
-    private static final long serialVersionUID = 834398160;
+    private static final long serialVersionUID = 57143498;
 
     /**
      * Setter for <code>public.session.id</code>.
@@ -290,5 +288,14 @@ public class SessionRecord extends UpdatableRecordImpl<SessionRecord> implements
         set(1, userId);
         set(2, createdAt);
         set(3, updatedAt);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("Session(");
+        for (Field<?> f : fields()) {
+            sb.append(" [").append(f.getName()).append("=").append(this.get(f)).append("]");
+        }
+        return sb.append(" )").toString();
     }
 }

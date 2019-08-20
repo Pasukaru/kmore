@@ -6,6 +6,8 @@
         <password>my_project</password>
     </jdbc>
     <generator>
+        <name>my.company.jooq.generator.JooqCodeGenerator</name>
+
         <database>
             <name>org.jooq.meta.postgres.PostgresDatabase</name>
             <inputSchema>public</inputSchema>
@@ -15,7 +17,7 @@
             <properties>
                 <property>
                     <key>codegen-db</key>
-                    <value>my_project</value>
+                    <value>jooq_codegen</value>
                 </property>
                 <property>
                     <key>maintenance-db</key>

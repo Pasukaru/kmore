@@ -26,7 +26,7 @@ import io.ktor.util.pipeline.PipelinePhase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import my.company.app.initConfig
-import my.company.app.lib.TransactionService
+import my.company.app.lib.DatabaseService
 import my.company.app.lib.koin.KoinCoroutineInterceptor
 import my.company.app.lib.koin.eager
 import my.company.app.lib.ktor.ParameterParser
@@ -80,7 +80,7 @@ abstract class BaseWebControllerTest(
     }
 
     protected open suspend fun TestApplicationEngine.mockTransactions() {
-        val transactionService = declareMock<TransactionService>()
+        val transactionService = declareMock<DatabaseService>()
         Mockito.doAnswer {
             runBlocking {
                 @Suppress("UNCHECKED_CAST") val fn = it.arguments.first() as suspend CoroutineScope.() -> Any?
@@ -120,11 +120,11 @@ abstract class BaseWebControllerTest(
     }
 
     suspend inline fun expectTransaction() {
-        Mockito.verify(eager<TransactionService>(), times(1)).transaction<Any>(any())
+        Mockito.verify(eager<DatabaseService>(), times(1)).transaction<Any>(any())
     }
 
     suspend inline fun expectNoTransaction() {
-        Mockito.verify(eager<TransactionService>(), times(1)).noTransaction<Any>(any())
+        Mockito.verify(eager<DatabaseService>(), times(1)).noTransaction<Any>(any())
     }
 
     inline fun <reified RESPONSE_BODY> TestApplicationCall.jsonResponse(): RESPONSE_BODY = response.jsonResponse()

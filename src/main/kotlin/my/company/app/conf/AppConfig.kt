@@ -2,6 +2,7 @@ package my.company.app.conf
 
 import com.typesafe.config.Config
 import com.typesafe.config.ConfigValue
+import io.ktor.auth.UserPasswordCredential
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 class AppConfig(
@@ -15,6 +16,7 @@ class AppConfig(
     val ktorPort = config.getInt("ktor.deployment.port")
 
     val swaggerPassword: String = config.getString("swagger.password")
+    val swaggerBasicAuthCredential = UserPasswordCredential("swagger", swaggerPassword)
 
     val isDev: Boolean = config.getString(KTOR_ENVIRONMENT) == "dev"
     val isTest: Boolean = config.getString(KTOR_ENVIRONMENT) == "test"

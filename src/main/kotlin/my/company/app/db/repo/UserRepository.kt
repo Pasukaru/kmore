@@ -1,7 +1,6 @@
 package my.company.app.db.repo
 
 import my.company.app.business_logic.user.GetUsersFilter
-import my.company.app.lib.jooq.withConnection
 import my.company.app.lib.repository.AbstractRepository
 import my.company.jooq.Tables.USER
 import my.company.jooq.tables.User
@@ -22,17 +21,20 @@ open class UserRepository : AbstractRepository<UUID, User, UserRecord>(USER) {
     }
 
     suspend fun findByFilter(filter: GetUsersFilter): List<UserRecord> {
-        return dsl.select().from(table)
-            .where(and(listOfNotNull(
-                filter.email?.let { table.EMAIL.containsIgnoreCase(it.trim()) },
-                filter.name?.let { concat(table.FIRST_NAME, field(inline(" ")), table.LAST_NAME).containsIgnoreCase(it.trim()) },
-                filter.createdAtBefore?.let { table.CREATED_AT.lessThan(it) }
-            )))
-            .withConnection().fetch().into(table)
+        return query {
+            select()
+                .from(table)
+                .where(and(listOfNotNull(
+                    filter.email?.let { table.EMAIL.containsIgnoreCase(it.trim()) },
+                    filter.name?.let { concat(table.FIRST_NAME, field(inline(" ")), table.LAST_NAME).containsIgnoreCase(it.trim()) },
+                    filter.createdAtBefore?.let { table.CREATED_AT.lessThan(it) }
+                )))
+                .fetch().into(table)
+        }
     }
 
     suspend fun findByEmailIgnoringCase(email: String): UserRecord? =
-        dsl.select().from(table).where(table.EMAIL.equalIgnoreCase(email.trim())).withConnection().fetchOne()?.into(table)
+        query { select().from(table).where(table.EMAIL.equalIgnoreCase(email.trim())).fetchOne()?.into(table) }
 
     suspend fun existsByEmailIgnoringCase(email: String): Boolean = findByEmailIgnoringCase(email) != null
 }

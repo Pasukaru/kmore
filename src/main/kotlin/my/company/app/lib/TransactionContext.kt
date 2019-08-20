@@ -61,7 +61,7 @@ class TransactionContext(
         if (committed || rolledBack) error("Transaction is already completed")
     }
 
-    suspend fun <T> execute(op: Connection.() -> T): T = withContext(Dispatchers.IO) {
+    suspend fun <T> execute(op: (Connection) -> T): T = withContext(Dispatchers.IO) {
         logger.trace("${this@TransactionContext}: Waiting for lock")
         try {
             synchronized(connection) {

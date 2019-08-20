@@ -40,5 +40,5 @@ gradle.taskGraph.whenReady {
 task generateJooqClasses(type: JavaExec) {
     classpath sourceSets.main.runtimeClasspath
     workingDir = project.projectDir
-    main = "my.company.JooqCodeGeneratorKt"
+    main = "my.company.jooq.generator.MainKt"
 }
