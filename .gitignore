@@ -1,5 +1,10 @@
 .gradle/
-.idea/
+
+# Exclude .idea folder, but keep runConfigurations within this folder
+!.idea/
+
+.idea/*
+!.idea/runConfigurations/
 
 build/
 out/
