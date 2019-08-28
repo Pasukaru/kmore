@@ -4,11 +4,14 @@ import com.zaxxer.hikari.pool.HikariPool
 import io.ktor.application.Application
 import io.ktor.application.ApplicationFeature
 import io.ktor.util.AttributeKey
+import kotlinx.coroutines.asContextElement
 import kotlinx.coroutines.runBlocking
 import my.company.app.conf.AppConfig
 import my.company.app.lib.DatabaseService
+import my.company.app.lib.koin.KoinContext
 import my.company.app.lib.koin.eager
 import my.company.app.lib.ktor.FlywayFeature.Feature.flyway
+import my.company.app.lib.ktor.getKoin
 import my.company.app.lib.logger
 
 @Suppress("MagicNumber")
@@ -37,7 +40,7 @@ class LoadFixturesFeature {
 
             val flyway = flyway(appConfig)
             flyway.migrate()
-            runBlocking { feature.loadFixtures() }
+            runBlocking(KoinContext.asContextElement(pipeline.getKoin())) { feature.loadFixtures() }
 
             logger.info("Fixtures loaded in ${System.currentTimeMillis() - start}ms")
             System.exit(0)

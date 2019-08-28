@@ -34,7 +34,6 @@ class WebLoginTest : BaseWebControllerTest(WebLoginLocation::class) {
         Mockito.doReturn(mockedResponse).`when`(actionMock).execute(capture(actionRequest))
 
         jsonPost(request) {
-            expectTransaction()
             expectJsonResponse(HttpStatusCode.Created, WebLoginResponse(id = mockedResponse.id))
             assertThat(actionRequest.singleValue).isEqualTo(LoginRequest(email = request.email, passwordClean = request.password))
         }

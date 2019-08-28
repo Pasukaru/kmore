@@ -4,11 +4,15 @@ import com.zaxxer.hikari.pool.HikariPool
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import my.company.app.lib.koin.eager
+import my.company.app.db.IsolationLevel
+import my.company.app.lib.koin.lazy
+import org.jooq.SQLDialect
 import java.sql.Connection
+import kotlin.coroutines.coroutineContext
 
 class DatabaseService {
-    private val pool = eager<HikariPool>()
+    private val pool by lazy<HikariPool>()
+    private val sqlDialect: SQLDialect = SQLDialect.POSTGRES_9_5
 
     /**
      * Acquires a connection from the connection.
@@ -28,36 +32,35 @@ class DatabaseService {
      * Creates a coroutine context with an active database connection and starts a new transaction.
      * Then calls [block] within that context.
      *
+     * If [inherit] is true, the surrounding transaction will be used instead.
+     * This will fail in case the surrounding transaction has a different isolation level or read only property.
+     * If no surrounding transaction exists, a new one will be created.
+     * When the transaction is inherited from the surrounding scope, it will not be committed when this function returns.
+     *
      * The transaction will be committed if [block] returns normally.<br/>
      * The transaction will be rolled back if [block] throws an exception.
      *
      * @see [withConnection]
      */
-    suspend fun <T> transaction(block: suspend CoroutineScope.() -> T): T = withConnection { connection ->
-        val tx = TransactionContext(connection)
+    suspend fun <T> transaction(
+        isolationLevel: IsolationLevel = IsolationLevel.READ_COMMITTED,
+        readOnly: Boolean = false,
+        inherit: Boolean = true,
+        block: suspend CoroutineScope.() -> T
+    ): T {
+        val existingTx = coroutineContext[TransactionContext]
 
-        tx.beginTransaction()
-
-        try {
-            val result = withContext(tx, block)
-
-            tx.commit()
-
-            return@withConnection result
-        } catch (e: Throwable) {
-            tx.rollback()
-            throw e
+        return if (existingTx != null && inherit) {
+            if (isolationLevel != existingTx.isolationLevel) error("Cannot inherit transaction with different isolation level: ${existingTx.isolationLevel} != $isolationLevel")
+            if (readOnly != existingTx.readOnly) error("Cannot inherit transaction with different readonly property: ${existingTx.readOnly} != $readOnly")
+            withContext(coroutineContext, block)
+        } else {
+            withConnection { connection ->
+                val tx = TransactionContext(connection, sqlDialect)
+                tx.transaction(isolationLevel, readOnly) {
+                    block()
+                }
+            }
         }
-    }
-
-    /**
-     * Creates a coroutine context with an active database connection that does not use any transaction management.
-     * Then calls [block] within that context.
-     *
-     * @see [withConnection]
-     */
-    suspend fun <T> noTransaction(block: suspend CoroutineScope.() -> T): T = withConnection { connection ->
-        val tx = TransactionContext(connection)
-        return@withConnection withContext(tx, block)
     }
 }

@@ -53,7 +53,7 @@ class AuthInterceptor : WebInterceptor() {
     }
 
     private suspend fun PipelineContext<*, ApplicationCall>.setSessionCallAttributes() {
-        databaseService.noTransaction {
+        databaseService.transaction(readOnly = true) {
             val token = call.request.header("X-Auth-Token")?.tryOrNull { UUID.fromString(it) }
 
             if (token != null) {

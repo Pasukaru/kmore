@@ -8,8 +8,6 @@ import io.ktor.locations.get
 import io.ktor.locations.post
 import io.ktor.routing.Routing
 import io.ktor.util.pipeline.PipelineContext
-import kotlinx.coroutines.CoroutineScope
-import my.company.app.lib.DatabaseService
 import my.company.app.lib.controller.AbstractController
 import my.company.app.lib.koin.lazy
 import my.company.app.lib.ktor.ParameterParser
@@ -35,7 +33,6 @@ abstract class AbstractWebController(
     tag: Tag = Tag(name, description)
 ) : AbstractController(tag) {
 
-    protected val databaseService: DatabaseService by lazy()
     protected val parameterParser: ParameterParser by lazy()
 
     companion object {
@@ -78,7 +75,4 @@ abstract class AbstractWebController(
             withAuthContext { this@get.getOp() }
         }
     }
-
-    protected suspend inline fun <reified T> transaction(crossinline block: suspend CoroutineScope.() -> T): T = databaseService.transaction { block() }
-    protected suspend inline fun <reified T> noTransaction(crossinline block: suspend CoroutineScope.() -> T): T = databaseService.noTransaction { block() }
 }

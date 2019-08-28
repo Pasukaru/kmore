@@ -34,6 +34,10 @@ buildscript {
     }
 }
 
+plugins {
+    id 'jacoco'
+}
+
 group 'kmore'
 version '1.0-SNAPSHOT'
 
@@ -123,12 +127,32 @@ compileTestKotlin {
 
 test {
     useJUnitPlatform()
+    jacoco {
+        enabled true
+    }
 }
 
 task run(type: JavaExec) {
     dependsOn(build)
     classpath sourceSets.main.runtimeClasspath
     main = "MainKt"
+}
+
+jacoco {
+    toolVersion = "0.8.4"
+}
+
+tasks.jacocoTestReport {
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: 'dev/**')
+        }))
+    }
+    reports {
+        html.enabled = true
+        xml.enabled = true
+        csv.enabled = false
+    }
 }
 
 jar {

@@ -4,6 +4,7 @@ import dev.fixtures.DbFixtures
 import kotlinx.coroutines.asContextElement
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import my.company.app.business_logic.TransactionOptions
 import my.company.app.initConfig
 import my.company.app.lib.TimeService
 import my.company.app.lib.TransactionContext
@@ -69,10 +70,11 @@ abstract class AbstractRepositoryTest : AbstractTest() {
 
     protected fun queryTest(testFn: suspend () -> Unit) = runBlocking {
         val connection = hikari.connection
-        val tx = TransactionContext(connection)
         try {
-            withContext(KoinContext.asContextElement(koin) + tx) {
-                testFn()
+            withContext(KoinContext.asContextElement(koin)) {
+                TransactionContext(connection).transaction(TransactionOptions.DEFAULT.isolationLevel, readOnly = false) {
+                    testFn()
+                }
             }
         } finally {
             hikari.evictConnection(connection)

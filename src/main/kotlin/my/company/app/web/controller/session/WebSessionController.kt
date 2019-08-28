@@ -21,7 +21,7 @@ class WebSessionController : AbstractWebController(
     override val routing: Routing.() -> Unit = {
         documentedPost<WebLoginLocation>({ req<WebLoginRequest>().res<WebLoginResponse>() }) {
             val request = mapper.req(validate(call.receive()))
-            val response = mapper.res(transaction { sessionActions.login.execute(request) })
+            val response = mapper.res(sessionActions.login.execute(request))
             call.respond(HttpStatusCode.Created, response)
         }
     }

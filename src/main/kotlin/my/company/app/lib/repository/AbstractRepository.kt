@@ -9,7 +9,6 @@ import org.jooq.Field
 import org.jooq.Record
 import org.jooq.SQLDialect
 import org.jooq.Table
-import org.jooq.impl.DSL
 import java.sql.SQLDataException
 import kotlin.coroutines.coroutineContext
 
@@ -28,12 +27,9 @@ abstract class AbstractRepository<ID, TABLE : Table<RECORD>, RECORD : Record>(
 
     protected open val dialect: SQLDialect get() = SQLDialect.POSTGRES_9_5
 
-    suspend fun <T> query(dialect: SQLDialect = this.dialect, block: DSLContext.() -> T): T {
+    suspend fun <T> query(block: DSLContext.() -> T): T {
         val tx = coroutineContext[TransactionContext] ?: error("No active database session")
-        return tx.execute { connection ->
-            val dsl = DSL.using(connection, dialect)
-            block(dsl)
-        }
+        return tx.execute(block)
     }
 
     open suspend fun findById(id: ID): RECORD? = query { select().from(table).where(primaryKey.eq(id)).fetchOne()?.into(table) }

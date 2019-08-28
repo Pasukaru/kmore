@@ -73,6 +73,7 @@ class LoginActionTest : AbstractActionTest() {
         }
 
         ctx.mockedUser.expectAllUnchanged()
+        expectTransaction()
 
         Mockito.verify(repo.user).findByEmailIgnoringCase(ctx.request.email)
         Mockito.verify(passwordHelper).checkPassword(ctx.mockedUser.password, ctx.request.passwordClean)

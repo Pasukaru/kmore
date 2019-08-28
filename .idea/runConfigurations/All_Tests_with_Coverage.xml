@@ -1,7 +1,11 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="All Tests with Coverage" type="JUnit" factoryName="JUnit">
     <module name="kmore.test" />
-    <extension name="coverage">
+    <extension name="coverage" runner="jacoco">
+      <pattern>
+        <option name="PATTERN" value="my.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
       <pattern>
         <option name="PATTERN" value="dev.*" />
         <option name="ENABLED" value="true" />

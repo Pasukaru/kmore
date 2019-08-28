@@ -4,7 +4,6 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.times
 import dev.fixtures.InMemoryFixtures
 import io.ktor.application.Application
 import io.ktor.application.ApplicationCallPipeline
@@ -23,11 +22,9 @@ import io.ktor.server.testing.setBody
 import io.ktor.server.testing.withTestApplication
 import io.ktor.util.pipeline.Pipeline
 import io.ktor.util.pipeline.PipelinePhase
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asContextElement
 import kotlinx.coroutines.runBlocking
 import my.company.app.initConfig
-import my.company.app.lib.DatabaseService
 import my.company.app.lib.koin.KoinContext
 import my.company.app.lib.koin.eager
 import my.company.app.lib.ktor.ParameterParser
@@ -80,22 +77,6 @@ abstract class BaseWebControllerTest(
         }
     }
 
-    protected open suspend fun TestApplicationEngine.mockTransactions() {
-        val transactionService = declareMock<DatabaseService>()
-        Mockito.doAnswer {
-            runBlocking {
-                @Suppress("UNCHECKED_CAST") val fn = it.arguments.first() as suspend CoroutineScope.() -> Any?
-                fn(this)
-            }
-        }.`when`(transactionService).noTransaction<Any>(any())
-        Mockito.doAnswer {
-            runBlocking {
-                @Suppress("UNCHECKED_CAST") val fn = it.arguments.first() as suspend CoroutineScope.() -> Any?
-                fn(this)
-            }
-        }.`when`(transactionService).transaction<Any>(any())
-    }
-
     protected fun mockValidator(): ValidationService {
         val validator = declareMock<ValidationService>()
         Mockito.doAnswer { it.arguments.first() }.`when`(validator).validate<Any>(any())
@@ -114,18 +95,9 @@ abstract class BaseWebControllerTest(
                 application.routing {
                     skipInterceptors()
                 }
-                mockTransactions()
                 testFn()
             }
         }
-    }
-
-    suspend inline fun expectTransaction() {
-        Mockito.verify(eager<DatabaseService>(), times(1)).transaction<Any>(any())
-    }
-
-    suspend inline fun expectNoTransaction() {
-        Mockito.verify(eager<DatabaseService>(), times(1)).noTransaction<Any>(any())
     }
 
     inline fun <reified RESPONSE_BODY> TestApplicationCall.jsonResponse(): RESPONSE_BODY = response.jsonResponse()
