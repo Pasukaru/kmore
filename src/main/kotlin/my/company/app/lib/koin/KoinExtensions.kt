@@ -4,6 +4,7 @@ import io.ktor.application.Application
 import io.ktor.application.ApplicationCall
 import io.ktor.application.application
 import io.ktor.util.pipeline.PipelineContext
+import kotlinx.coroutines.asContextElement
 import kotlinx.coroutines.withContext
 import my.company.app.PackageNoOp
 import my.company.app.lib.ktor.getKoin
@@ -26,7 +27,7 @@ private val KoinLogger = logger(PackageNoOp::class.java.packageName + ".Koin")
 
 inline fun <reified T : Any> eager(qualifier: Qualifier? = null): T = eager(T::class, qualifier)
 fun <T : Any> eager(type: KClass<T>, qualifier: Qualifier? = null): T {
-    val koin = KoinContext.koinOrNull ?: error("${Thread.currentThread().name} Failed to inject $type (qualified by: $qualifier): KoinApplication has not been started")
+    val koin = KoinContext.getOrError().koin
     return koin.get(type, qualifier, null)
 }
 
@@ -41,8 +42,7 @@ suspend inline fun <T> PipelineContext<*, ApplicationCall>.withKoin(
 
 suspend fun <T> Application.withKoin(block: suspend () -> T): T {
     val koin = getKoin()
-    KoinContext.KOIN.set(koin)
-    return withContext(KoinCoroutineInterceptor(koin)) { block() }
+    return withContext(KoinContext.asContextElement(koin)) { block() }
 }
 
 fun Koin.resolveParameters(fn: KFunction<*>): Map<KParameter, Any> {

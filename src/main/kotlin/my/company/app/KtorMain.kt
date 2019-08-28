@@ -16,6 +16,8 @@ import io.ktor.locations.Locations
 import io.ktor.server.engine.ApplicationEngine
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import kotlinx.coroutines.asContextElement
+import kotlinx.coroutines.withContext
 import my.company.app.business_logic.session.SessionActions
 import my.company.app.business_logic.user.UserActions
 import my.company.app.conf.AppConfig
@@ -27,9 +29,9 @@ import my.company.app.lib.DatabaseService
 import my.company.app.lib.IdGenerator
 import my.company.app.lib.PasswordHelper
 import my.company.app.lib.TimeService
+import my.company.app.lib.koin.KoinContext
 import my.company.app.lib.koin.containerModule
 import my.company.app.lib.koin.eager
-import my.company.app.lib.koin.withKoin
 import my.company.app.lib.ktor.ApplicationWarmup
 import my.company.app.lib.ktor.HikariCPFeature
 import my.company.app.lib.ktor.KoinFeature
@@ -158,7 +160,7 @@ fun Application.mainModule() {
     install(WebRoutingFeature)
     install(StatusPages) {
         exception<Throwable> { error ->
-            withKoin {
+            withContext(KoinContext.asContextElement(getKoin())) {
                 val errorHandler = eager<GlobalWebErrorHandler>()
                 if (!errorHandler.handleError(this@exception, error)) {
                     KtorMain.logger.error("Caught unhandled error:", error)

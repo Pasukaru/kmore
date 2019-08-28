@@ -1,13 +1,13 @@
 package my.company.app.db.repo
 
 import dev.fixtures.DbFixtures
+import kotlinx.coroutines.asContextElement
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import my.company.app.initConfig
 import my.company.app.lib.TimeService
 import my.company.app.lib.TransactionContext
 import my.company.app.lib.koin.KoinContext
-import my.company.app.lib.koin.KoinCoroutineInterceptor
 import my.company.app.lib.koin.containerModule
 import my.company.app.lib.koin.eager
 import my.company.app.lib.ktor.FlywayFeature
@@ -71,7 +71,7 @@ abstract class AbstractRepositoryTest : AbstractTest() {
         val connection = hikari.connection
         val tx = TransactionContext(connection)
         try {
-            withContext(KoinCoroutineInterceptor(koin) + tx) {
+            withContext(KoinContext.asContextElement(koin) + tx) {
                 testFn()
             }
         } finally {

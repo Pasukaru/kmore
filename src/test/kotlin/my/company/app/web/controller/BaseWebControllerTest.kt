@@ -24,10 +24,11 @@ import io.ktor.server.testing.withTestApplication
 import io.ktor.util.pipeline.Pipeline
 import io.ktor.util.pipeline.PipelinePhase
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.asContextElement
 import kotlinx.coroutines.runBlocking
 import my.company.app.initConfig
 import my.company.app.lib.DatabaseService
-import my.company.app.lib.koin.KoinCoroutineInterceptor
+import my.company.app.lib.koin.KoinContext
 import my.company.app.lib.koin.eager
 import my.company.app.lib.ktor.ParameterParser
 import my.company.app.lib.ktor.getKoin
@@ -109,7 +110,7 @@ abstract class BaseWebControllerTest(
         withTestApplication(Application::mainModule) {
             val koin = this.application.getKoin()
             parameterParser = eager()
-            runBlocking(KoinCoroutineInterceptor(koin)) {
+            runBlocking(KoinContext.asContextElement(koin)) {
                 application.routing {
                     skipInterceptors()
                 }

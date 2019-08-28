@@ -2,6 +2,7 @@ package my.company.app.business_logic
 
 import com.nhaarman.mockitokotlin2.any
 import dev.fixtures.InMemoryFixtures
+import kotlinx.coroutines.asContextElement
 import kotlinx.coroutines.runBlocking
 import my.company.app.db.ModelGenerator
 import my.company.app.initConfig
@@ -9,7 +10,6 @@ import my.company.app.lib.AuthorizationService
 import my.company.app.lib.IdGenerator
 import my.company.app.lib.TimeService
 import my.company.app.lib.koin.KoinContext
-import my.company.app.lib.koin.KoinCoroutineInterceptor
 import my.company.app.lib.koin.eager
 import my.company.app.lib.repository.Repositories
 import my.company.app.lib.validation.ValidationService
@@ -63,6 +63,6 @@ abstract class AbstractActionTest : AbstractTest() {
     }
 
     fun actionTest(testFn: suspend () -> Unit) {
-        runBlocking(KoinCoroutineInterceptor(koin)) { testFn() }
+        runBlocking(KoinContext.asContextElement(koin)) { testFn() }
     }
 }

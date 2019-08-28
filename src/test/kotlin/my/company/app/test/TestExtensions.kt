@@ -41,13 +41,13 @@ fun HttpStatusCode?.expectOK() = assertThat(this).isEqualTo(HttpStatusCode.OK)
 inline fun <reified BEAN : Any> declareSpy(qualifier: Qualifier? = null): BEAN {
     val bean = eager(BEAN::class, qualifier)
     val spy = Mockito.spy(bean)!!
-    KoinContext.koinApplication.modules(module { single(override = true, createdAtStart = true, qualifier = qualifier) { spy } })
+    KoinContext.getOrError().modules(module { single(override = true, createdAtStart = true, qualifier = qualifier) { spy } })
     return spy
 }
 
 inline fun <reified BEAN : Any> declareMock(qualifier: Qualifier? = null): BEAN {
     val mock = Mockito.mock(BEAN::class.java)!!
-    KoinContext.koinApplication.modules(module { single(override = true, createdAtStart = true, qualifier = qualifier) { mock } })
+    KoinContext.getOrError().modules(module { single(override = true, createdAtStart = true, qualifier = qualifier) { mock } })
     return mock
 }
 

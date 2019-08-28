@@ -17,15 +17,14 @@ class KoinFeature(val koinApplication: KoinApplication) {
         override val key: AttributeKey<KoinFeature> = KEY
 
         override fun install(pipeline: Application, configure: KoinAppDeclaration): KoinFeature {
-            val koin = KoinApplication.create()
+            val koin = KoinContext.startKoin(configure)
 
             pipeline.environment.monitor.subscribe(ApplicationStopped) {
                 koin.close()
             }
 
-            configure(koin)
             koin.createEagerInstances()
-            KoinContext.KOIN.set(koin)
+            KoinContext.set(koin)
 
             pipeline.intercept(ApplicationCallPipeline.Call) {
                 withKoin { proceed() }
