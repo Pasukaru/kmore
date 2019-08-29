@@ -1,13 +1,13 @@
 package my.company.app.business_logic.user
 
 import my.company.app.business_logic.BusinessLogicAction
+import my.company.app.generated.jooq.tables.records.UserRecord
 import my.company.app.lib.PasswordHelper
 import my.company.app.lib.UserByEmailAlreadyExistsException
 import my.company.app.lib.koin.lazy
 import my.company.app.lib.validation.Email
 import my.company.app.lib.validation.NotBlank
 import my.company.app.lib.validation.Password
-import my.company.jooq.tables.records.UserRecord
 
 data class CreateUserRequest(
     @field:Email

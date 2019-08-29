@@ -8,6 +8,7 @@ import assertk.assertions.isSameAs
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.capture
 import my.company.app.business_logic.AbstractActionTest
+import my.company.app.generated.jooq.tables.records.UserRecord
 import my.company.app.lib.Faker
 import my.company.app.lib.PasswordHelper
 import my.company.app.lib.UserByEmailAlreadyExistsException
@@ -19,7 +20,6 @@ import my.company.app.test.expectException
 import my.company.app.test.expectNotBlankValidation
 import my.company.app.test.expectPasswordValidation
 import my.company.app.test.singleValue
-import my.company.jooq.tables.records.UserRecord
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentCaptor

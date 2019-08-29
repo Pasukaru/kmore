@@ -145,7 +145,7 @@ jacoco {
 tasks.jacocoTestReport {
     afterEvaluate {
         classDirectories.setFrom(files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: 'dev/**')
+            fileTree(dir: it, exclude: ['dev/**', 'my/company/app/generated'])
         }))
     }
     reports {

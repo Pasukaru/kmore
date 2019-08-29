@@ -8,6 +8,8 @@ import assertk.assertions.isSameAs
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.capture
 import my.company.app.business_logic.AbstractActionTest
+import my.company.app.generated.jooq.tables.records.SessionRecord
+import my.company.app.generated.jooq.tables.records.UserRecord
 import my.company.app.lib.InvalidLoginCredentialsException
 import my.company.app.lib.PasswordHelper
 import my.company.app.test.captor
@@ -16,8 +18,6 @@ import my.company.app.test.expectAllChanged
 import my.company.app.test.expectAllUnchanged
 import my.company.app.test.expectException
 import my.company.app.test.singleValue
-import my.company.jooq.tables.records.SessionRecord
-import my.company.jooq.tables.records.UserRecord
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentCaptor

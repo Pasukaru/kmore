@@ -1,10 +1,10 @@
 package my.company.app.business_logic.session
 
 import my.company.app.business_logic.BusinessLogicAction
+import my.company.app.generated.jooq.tables.records.SessionRecord
 import my.company.app.lib.InvalidLoginCredentialsException
 import my.company.app.lib.PasswordHelper
 import my.company.app.lib.koin.lazy
-import my.company.jooq.tables.records.SessionRecord
 
 data class LoginRequest(val email: String, val passwordClean: String)
 

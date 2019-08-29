@@ -1,17 +1,16 @@
 package my.company.app.db.repo
 
 import my.company.app.business_logic.user.GetUsersFilter
+import my.company.app.generated.jooq.Tables.USER
+import my.company.app.generated.jooq.tables.records.UserRecord
 import my.company.app.lib.repository.AbstractRepository
-import my.company.jooq.Tables.USER
-import my.company.jooq.tables.User
-import my.company.jooq.tables.records.UserRecord
 import org.jooq.impl.DSL.and
 import org.jooq.impl.DSL.concat
 import org.jooq.impl.DSL.field
 import org.jooq.impl.DSL.inline
 import java.util.UUID
 
-open class UserRepository : AbstractRepository<UUID, User, UserRecord>(USER) {
+open class UserRepository : AbstractRepository<UUID, my.company.app.generated.jooq.tables.User, UserRecord>(USER) {
     override fun beforeInsert(record: UserRecord) {
         record.createdAt = timeService.now()
     }

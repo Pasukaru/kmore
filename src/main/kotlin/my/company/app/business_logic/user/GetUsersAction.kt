@@ -1,7 +1,7 @@
 package my.company.app.business_logic.user
 
 import my.company.app.business_logic.BusinessLogicAction
-import my.company.jooq.tables.records.UserRecord
+import my.company.app.generated.jooq.tables.records.UserRecord
 import java.time.Instant
 
 data class GetUsersFilter(

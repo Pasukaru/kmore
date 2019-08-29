@@ -41,6 +41,8 @@ class DatabaseService {
      * The transaction will be rolled back if [block] throws an exception.
      *
      * @see [withConnection]
+     * @see [newTransaction]
+     * @see [inheritTransaction]
      */
     suspend fun <T> transaction(
         isolationLevel: IsolationLevel = IsolationLevel.READ_COMMITTED,
@@ -49,18 +51,30 @@ class DatabaseService {
         block: suspend CoroutineScope.() -> T
     ): T {
         val existingTx = coroutineContext[TransactionContext]
-
         return if (existingTx != null && inherit) {
-            if (isolationLevel != existingTx.isolationLevel) error("Cannot inherit transaction with different isolation level: ${existingTx.isolationLevel} != $isolationLevel")
-            if (readOnly != existingTx.readOnly) error("Cannot inherit transaction with different readonly property: ${existingTx.readOnly} != $readOnly")
-            withContext(coroutineContext, block)
+            inheritTransaction(existingTx, isolationLevel, readOnly, block)
         } else {
-            withConnection { connection ->
-                val tx = TransactionContext(connection, sqlDialect)
-                tx.transaction(isolationLevel, readOnly) {
-                    block()
-                }
-            }
+            newTransaction(isolationLevel, readOnly, block)
         }
+    }
+
+    suspend fun <T> newTransaction(
+        isolationLevel: IsolationLevel,
+        readOnly: Boolean,
+        block: suspend CoroutineScope.() -> T
+    ): T = withConnection { connection ->
+        val tx = TransactionContext(connection, sqlDialect)
+        tx.transaction(isolationLevel, readOnly, block)
+    }
+
+    suspend fun <T> inheritTransaction(
+        existingTransaction: TransactionContext,
+        isolationLevel: IsolationLevel,
+        readOnly: Boolean,
+        block: suspend CoroutineScope.() -> T
+    ): T {
+        if (isolationLevel != existingTransaction.isolationLevel) error("Cannot inherit transaction with different isolation level: ${existingTransaction.isolationLevel} != $isolationLevel")
+        if (readOnly != existingTransaction.readOnly) error("Cannot inherit transaction with different readonly property: ${existingTransaction.readOnly} != $readOnly")
+        return withContext(coroutineContext, block)
     }
 }

@@ -1,8 +1,8 @@
 package dev.fixtures
 
+import my.company.app.generated.jooq.tables.records.SessionRecord
+import my.company.app.generated.jooq.tables.records.UserRecord
 import my.company.app.lib.Faker
-import my.company.jooq.tables.records.SessionRecord
-import my.company.jooq.tables.records.UserRecord
 import java.security.SecureRandom
 import java.time.Instant
 import java.util.UUID

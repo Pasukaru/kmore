@@ -2,7 +2,7 @@ package my.company.app.web.controller.user
 
 import my.company.app.business_logic.user.CreateUserRequest
 import my.company.app.business_logic.user.GetUsersFilter
-import my.company.jooq.tables.records.UserRecord
+import my.company.app.generated.jooq.tables.records.UserRecord
 
 class WebUserMapper {
 

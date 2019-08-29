@@ -40,7 +40,7 @@
         </generate>
 
         <target>
-            <packageName>my.company.jooq</packageName>
+            <packageName>my.company.app.generated.jooq</packageName>
             <directory>../src/generated</directory>
         </target>
     </generator>

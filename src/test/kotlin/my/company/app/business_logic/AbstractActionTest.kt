@@ -1,6 +1,7 @@
 package my.company.app.business_logic
 
 import assertk.assertThat
+import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.capture
@@ -23,12 +24,12 @@ import my.company.app.test.AbstractTest
 import my.company.app.test.MockedTimeService
 import my.company.app.test.captor
 import my.company.app.test.mockedContainerModule
-import my.company.app.test.singleValue
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.koin.core.KoinApplication
 import org.koin.dsl.module
 import org.mockito.Mockito
+import org.mockito.Mockito.times
 
 abstract class AbstractActionTest : AbstractTest() {
 
@@ -86,9 +87,12 @@ abstract class AbstractActionTest : AbstractTest() {
         }.`when`(databaseService).transaction<Any>(capture(transactionIsolationLevelCaptor), capture(transactionReadOnlyCaptor), any(), any())
     }
 
-    fun expectTransaction(isolationLevel: IsolationLevel = IsolationLevel.READ_COMMITTED, readOnly: Boolean = false) {
-        assertThat(transactionIsolationLevelCaptor.singleValue).isEqualTo(isolationLevel)
-        assertThat(transactionReadOnlyCaptor.singleValue).isEqualTo(readOnly)
+    fun expectTransaction(calls: Int = 1, isolationLevel: IsolationLevel = IsolationLevel.READ_COMMITTED, readOnly: Boolean = false) {
+        runBlocking { Mockito.verify(databaseService, times(calls)).transaction<Any>(any(), any(), any(), any()) }
+        assertThat(transactionIsolationLevelCaptor.allValues).hasSize(calls)
+        assertThat(transactionReadOnlyCaptor.allValues).hasSize(calls)
+        assertThat(transactionIsolationLevelCaptor.value).isEqualTo(isolationLevel)
+        assertThat(transactionReadOnlyCaptor.value).isEqualTo(readOnly)
     }
 
     fun actionTest(testFn: suspend () -> Unit) {

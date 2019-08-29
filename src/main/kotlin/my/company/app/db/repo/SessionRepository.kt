@@ -1,14 +1,13 @@
 package my.company.app.db.repo
 
 import my.company.app.db.query.FindSessionByIdWithUserQuery
+import my.company.app.generated.jooq.Tables.SESSION
+import my.company.app.generated.jooq.tables.records.SessionRecord
 import my.company.app.lib.repository.AbstractRepository
-import my.company.jooq.Tables.SESSION
-import my.company.jooq.tables.Session
-import my.company.jooq.tables.records.SessionRecord
 import java.util.UUID
 import org.jooq.JoinType.JOIN as INNER_JOIN
 
-open class SessionRepository : AbstractRepository<UUID, Session, SessionRecord>(SESSION) {
+open class SessionRepository : AbstractRepository<UUID, my.company.app.generated.jooq.tables.Session, SessionRecord>(SESSION) {
     override fun beforeInsert(record: SessionRecord) {
         record.createdAt = timeService.now()
     }

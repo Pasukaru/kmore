@@ -1,10 +1,7 @@
 package my.company.app.business_logic
 
 import my.company.app.db.IsolationLevel
-import my.company.app.lib.TransactionContext
-import org.junit.jupiter.api.RepeatedTest
 import org.junit.jupiter.api.Test
-import kotlin.coroutines.coroutineContext
 
 class BusinessLogicActionTest : AbstractActionTest() {
 
@@ -22,22 +19,20 @@ class BusinessLogicActionTest : AbstractActionTest() {
         override suspend fun action(request: Unit) {}
     }
 
-    @RepeatedTest(10)
+    @Test
     fun createsCustomTransactionProperly() = actionTest {
-        val tx = TransactionOptions(
-            isolationLevel = IsolationLevel.values().random(),
-            readOnly = Math.random() > 0.5
+        var tx = TransactionOptions(
+            isolationLevel = IsolationLevel.SERIALIZABLE,
+            readOnly = false
         )
         TestTransactionAction(tx).execute(Unit)
-        expectTransaction(isolationLevel = tx.isolationLevel, readOnly = tx.readOnly)
-    }
+        expectTransaction(calls = 1, isolationLevel = tx.isolationLevel, readOnly = tx.readOnly)
 
-    private class TxCaptureAction : BusinessLogicAction<Unit, Unit>() {
-        var tx: TransactionContext? = null
-            private set
-
-        override suspend fun action(request: Unit) {
-            tx = coroutineContext[TransactionContext]
-        }
+        tx = TransactionOptions(
+            isolationLevel = IsolationLevel.READ_UNCOMMITTED,
+            readOnly = true
+        )
+        TestTransactionAction(tx).execute(Unit)
+        expectTransaction(calls = 2, isolationLevel = tx.isolationLevel, readOnly = tx.readOnly)
     }
 }

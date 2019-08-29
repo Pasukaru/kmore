@@ -2,8 +2,8 @@ package dev.fixtures
 
 import dev.fixtures.RecordFixtures.Companion.MIN_CRYPTO_LOG_ROUNDS
 import dev.fixtures.RecordFixtures.Companion.SECURE_RANDOM
-import my.company.jooq.tables.records.SessionRecord
-import my.company.jooq.tables.records.UserRecord
+import my.company.app.generated.jooq.tables.records.SessionRecord
+import my.company.app.generated.jooq.tables.records.UserRecord
 import org.jooq.Record
 import org.springframework.security.crypto.bcrypt.BCrypt
 import java.time.Instant

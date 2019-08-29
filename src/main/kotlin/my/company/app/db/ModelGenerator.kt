@@ -1,9 +1,9 @@
 package my.company.app.db
 
+import my.company.app.generated.jooq.tables.records.SessionRecord
+import my.company.app.generated.jooq.tables.records.UserRecord
 import my.company.app.lib.IdGenerator
 import my.company.app.lib.koin.lazy
-import my.company.jooq.tables.records.SessionRecord
-import my.company.jooq.tables.records.UserRecord
 import java.util.UUID
 
 class ModelGenerator {
